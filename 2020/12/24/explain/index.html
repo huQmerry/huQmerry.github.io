@@ -557,24 +557,24 @@
 <li><p><strong>SIMPLE</strong></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">简单的查询，不包含子查询或union查询 </span><br><span class="line">例子：explain select * from user_info where id = <span class="number">2</span></span><br></pre></td></tr></table></figure>
 
-<p>![image-20201113193527022](/Users/bjhl/Library/Application Support/typora-user-images/image-20201113193527022.png)</p>
+<p><img src="https://huqblog.oss-cn-beijing.aliyuncs.com/mysql/explain/simple.png" alt=""></p>
 </li>
 <li><h5 id="PRIMARY、SUBQUERY"><a href="#PRIMARY、SUBQUERY" class="headerlink" title="PRIMARY、SUBQUERY"></a>PRIMARY、<strong>SUBQUERY</strong></h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">包含子查询，则最外层的查询为PRIMARY,子查询为SUBQUERY</span><br><span class="line">例子：explain select * from order_info where user_id = (SELECT id from user_info where id = <span class="number">2</span>)</span><br></pre></td></tr></table></figure>
 
 
 </li>
 </ul>
-<p>  ![image-20201113195017015](/Users/bjhl/Library/Application Support/typora-user-images/image-20201113195017015.png)</p>
+<p>  <img src="https://huqblog.oss-cn-beijing.aliyuncs.com/mysql/explain/primary.png" alt=""></p>
 <ul>
 <li><p><strong>DERIVED</strong></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">在FROM列表中包含的子查询被标记为DERIVED</span><br><span class="line">例子：explain SELECT * from (SELECT * from order_info where user_id = <span class="number">1</span>) a;</span><br></pre></td></tr></table></figure>
 
-<p>![image-20201224110449156](/Users/bjhl/Library/Application Support/typora-user-images/image-20201224110449156.png)</p>
+<p><img src="https://huqblog.oss-cn-beijing.aliyuncs.com/mysql/explain/derived.png" alt=""></p>
 </li>
 <li><p><strong>UNION</strong>、<strong>UNION RESULT</strong></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>、union的第二个select被标记为UNION</span><br><span class="line"><span class="number">2</span>、UNION RESULT表示union获取的结果</span><br><span class="line">例子：explain select * from order_info where user_id = <span class="number">1</span> union SELECT * from order_info where id = <span class="number">2</span></span><br></pre></td></tr></table></figure>
 
-<p>![image-20201113195728365](/Users/bjhl/Library/Application Support/typora-user-images/image-20201113195728365.png)</p>
+<p><img src="https://huqblog.oss-cn-beijing.aliyuncs.com/mysql/explain/union.png" alt=""></p>
 </li>
 </ul>
 <h3 id="table"><a href="#table" class="headerlink" title="table"></a>table</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>、代表表名，或者表得别名，或者是一个临时标示符。</span><br><span class="line">    &lt;union <span class="number">1</span>,<span class="number">2</span>&gt; 该行指id为<span class="number">1</span>和id为<span class="number">2</span>的并集</span><br><span class="line">    &lt;derived <span class="number">2</span>&gt; 该行指派生表结果值id为<span class="number">2</span>，比如from子句中的子查询</span><br><span class="line">    等</span><br></pre></td></tr></table></figure>
@@ -596,7 +596,7 @@
 <li><p>如下例子：from的子查询派生的表只有一行数据,，所以PRIMARY的链接类型为system。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">explain</span> <span class="keyword">SELECT</span> * <span class="keyword">from</span> (<span class="keyword">SELECT</span> * <span class="keyword">from</span> order_info <span class="keyword">where</span> <span class="keyword">id</span> = <span class="number">1</span>) a;</span><br></pre></td></tr></table></figure>
 
-<p>![image-20201224114653226](/Users/bjhl/Library/Application Support/typora-user-images/image-20201224114653226.png)</p>
+<p><img src="https://huqblog.oss-cn-beijing.aliyuncs.com/mysql/explain/system.png" alt=""></p>
 </li>
 </ul>
 <h4 id="const"><a href="#const" class="headerlink" title="const"></a>const</h4><ul>
@@ -605,7 +605,7 @@
 <li><p>如下例子：id为主键，所以只会匹配一行数据，所以type为const</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">explain</span> <span class="keyword">SELECT</span> * <span class="keyword">from</span> order_info <span class="keyword">where</span> <span class="keyword">id</span> = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
 
-<p>![image-20201224115004932](/Users/bjhl/Library/Application Support/typora-user-images/image-20201224115004932.png)</p>
+<p><img src="https://huqblog.oss-cn-beijing.aliyuncs.com/mysql/explain/const.png" alt=""></p>
 </li>
 </ul>
 <h4 id="eq-ref"><a href="#eq-ref" class="headerlink" title="eq_ref"></a>eq_ref</h4><ul>
@@ -614,7 +614,7 @@
 <li><p>如下例子：对表a的查询type是all走的全表扫描，因为a.user_id并没有建索引。a表的每一行都要与b表的数据匹配，但是b表的id是主键只有唯一一条数据与之匹配，所以b表的type是eq_ref。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">explain</span> <span class="keyword">SELECT</span> * <span class="keyword">from</span> order_info <span class="keyword">as</span> a ,user_info <span class="keyword">as</span> b <span class="keyword">where</span> a.user_id = b.id</span><br></pre></td></tr></table></figure>
 
-<p>![image-20201224135450148](/Users/bjhl/Library/Application Support/typora-user-images/image-20201224135450148.png)</p>
+<p><img src="https://huqblog.oss-cn-beijing.aliyuncs.com/mysql/explain/eq_ref.png" alt=""></p>
 </li>
 </ul>
 <h4 id="ref、ref-or-null"><a href="#ref、ref-or-null" class="headerlink" title="ref、ref_or_null"></a>ref、ref_or_null</h4><ul>
@@ -623,7 +623,7 @@
 <li><p>如下例子：user_id是一个普通索引也就是非唯一索引，所以type是ref。ref_or_null和ref的区别就是ref_or_null的查询条件可以是null。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">explain</span> <span class="keyword">SELECT</span> * <span class="keyword">from</span> order_info <span class="keyword">as</span> a <span class="keyword">where</span> a.user_id = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
 
-<p>![image-20201224144439170](/Users/bjhl/Library/Application Support/typora-user-images/image-20201224144439170.png)</p>
+<p><img src="https://huqblog.oss-cn-beijing.aliyuncs.com/mysql/explain/ref.png" alt=""></p>
 </li>
 </ul>
 <h4 id="range"><a href="#range" class="headerlink" title="range"></a>range</h4><ul>
@@ -632,7 +632,7 @@
 <li><p>如下例子：user_id是一个索引键，查询的user_id大于1的值，范围查询type为range</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">explain</span> <span class="keyword">SELECT</span> * <span class="keyword">from</span> order_info  <span class="keyword">where</span> user_id &gt; <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
 
-<p>![image-20201224145819104](/Users/bjhl/Library/Application Support/typora-user-images/image-20201224145819104.png)</p>
+<p><img src="https://huqblog.oss-cn-beijing.aliyuncs.com/mysql/explain/range.png" alt=""></p>
 </li>
 </ul>
 <h4 id="index"><a href="#index" class="headerlink" title="index"></a>index</h4><ul>
@@ -709,7 +709,7 @@
     <div class='new-meta-box'>
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2020-12-24T15:10:24+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2020-12-24T15:37:44+08:00">
   <a class='notlink'>
     <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
     <p>更新于：Dec 24, 2020</p>
