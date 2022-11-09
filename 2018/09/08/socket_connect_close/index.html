@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+  <meta name="description" content="胡强的博客">
+  
+  <title>
+    三次握手，四次挥手详解 |
+    
+    小胡僧
+  </title>
+  <!-- Icon -->
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 6.2.0"><link rel="alternate" href="/atom.xml" title="小胡僧" type="application/atom+xml">
+</head>
+
+<body>
+  <main class="content">
+    <section class="outer">
+  <article id="post-socket_connect_close" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h1 class="article-title" itemprop="name">
+    三次握手，四次挥手详解
+  </h1>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2018/09/08/socket_connect_close/" class="article-date">
+  <time datetime="2018-09-08T14:30:01.000Z" itemprop="datePublished">2018-09-08</time>
+</a>
+      
+<div class="article-category">
+  <a class="article-category-link" href="/categories/TCP-IP/">TCP/IP</a>
+</div>
+
+    </div>
+    
+
+    
+    
+<div class="tocbot"></div>
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <blockquote>
+<p>总结一下TCP&#x2F;IP中三次握手和四次挥手的实现过程和各种状态，以及为什么要三次握手，四次挥手，四次挥手中为什么会有time_wait&#x3D;2MSL等一些问题…..</p>
+</blockquote>
+<span id="more"></span>
+
+
+<p>为了通过IP数据报实现可靠性传输，需要考虑很多事情，例如数据的破坏，丢包，重复等问题，如果不能解决这些问题，就无从谈起可靠传输。TCP通过检验和序列号，确认应答，重发控制，连接管理，以及窗口控制等机制，实现可靠传输。</p>
+<h3 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h3><ul>
+<li>最开始的时候客户端与服务器都处于CLOSED状态，主动打开的是client被动打开的是server。</li>
+<li>client向服务器发出连接请求，TCP首部发送一个SYN&#x3D;1包作为建立连接的请求，等待确认应答，同时选择一个初始序列号seq&#x3D;x。</li>
+<li>server收到请求报文后，如果同意链接，接收端会返回一个已收到消息的通知，这个消息叫做确认应答(ACK),确认应答号ack&#x3D;x+1,同时也要自己初始化一个序列号seq&#x3D;y,以及连接请求SYN&#x3D;1</li>
+<li>client收到确认后，也要向服务器给出确认。确认报文ACK&#x3D;1,确认应答号ack&#x3D;y+1,自己的序列号seq&#x3D;x+1,此时TCP连接建立，双发可以开始通信了。</li>
+</ul>
+<p><img src="https://i.imgur.com/59y7S5p.png" alt="三次握手"></p>
+<ol>
+<li>如果超过一定时间未收到确认应答，发送端将进行数据重发。比如第一次client未收到server的确认应答，超时后就会重新发送连接请求；同样server未收到client的确认应答，超时后也会重新发送连接请求。</li>
+<li>为什么client最后还要发送一次确认：<br>主要是防止失效连接的报文有传送到服务器，产生错误。如果使用的是两次握手建立连接，假设有这样一种场景，客户端发送了第一个请求连接并且没有丢失，只是因为在网络结点中滞留的时间太长了，由于TCP的客户端迟迟没有收到确认报文，以为服务器没有收到，此时重新向服务器发送这条报文，此后客户端和服务器经过两次握手完成连接，传输数据，然后关闭连接。此时此前滞留的那一次请求连接，网络通畅了到达了服务器，这个报文本该是失效的，但是，两次握手的机制将会让客户端和服务器再次建立连接，这将导致不必要的错误和资源的浪费。如果采用的是三次握手，就算是那一次失效的报文传送过来了，服务端接受到了那条失效报文并且回复了确认报文，但是客户端不会再次发出确认。由于服务器收不到确认，就知道客户端并没有请求连接</li>
+<li>server端易受到syn攻击：<br>syn攻击就是Client在短时间内伪造大量不存在的IP地址，并向server不断的发送syn连接请求，server则回复确认包，并等待client确认，但由于IP地址不存在，所以不会发送确认应答。那么server就会不断重发直至超时，这些伪造的syn包将长时间占用未连接队列，导致正常的syn请求因为队满而被丢弃，从而引起网络阻塞甚至系统瘫痪。<br>防范SYN攻击措施：降低主机的等待时间使主机尽快的释放半连接的占用，短时间受到某IP的重复SYN则丢弃后续请求等。</li>
+</ol>
+<h3 id="四次挥手"><a href="#四次挥手" class="headerlink" title="四次挥手"></a>四次挥手</h3><p>数据传输完毕后，释放连接，双发都可以调用close释放连接，由是谁发起的关闭连接客户端服务端分为主动关闭和被动关闭。</p>
+<ul>
+<li>加入客户端先发起的关闭连接请求，Tcp首部会发送一个FIN&#x3D;1作为释放连接请求，其序列号seq&#x3D;u(等于前面已经传送过来的数据的最后一个字节的序号加1)，这时客户端从established状态变成fin-wait-1状态，这时的客户端只能接收数据，不能发送数据.</li>
+<li>服务器收到释放连接的报文后，发出确认应答ACK&#x3D;1，确认应答号ack&#x3D;u+1,并带上自己的序列号seq&#x3D;v，此时服务器从established状态变为close_wait状态，在该状态的服务器可能还会发送数据，所以可能会持续一段时间。</li>
+<li>客户端收到服务器的确认应答后，客户端就进入fin-wait-2状态，等待服务器发送释放连接报文，在这个期间，还会接受服务器发送的数据。</li>
+<li>服务器最后的数据发送完之后，就向客户端发送释放连接报文，FIN&#x3D;1，ACK&#x3D;1，ack&#x3D;u+1，自己的序列号seq&#x3D;w(由于是半连接，可能又发送了一些数据，所以序列号不同)，此时服务器就进入last_ack等待客户端的确认应答。</li>
+<li>客户端收到释放连接请求后，发出确认应答，ACK&#x3D;1，ack&#x3D;w+1,序列号seq&#x3D;u+1，此时客户端进入time_wait必须经过2MSL(最长报文时间)后进入closed。</li>
+<li>服务器只要收到确认应答立即进入closed状态。</li>
+</ul>
+<p><img src="https://i.imgur.com/qIBpRT9.png"></p>
+<ol>
+<li>为什么time_wait要等待2MSL才进入closed？<br>第一，保证客户端发送的最后一个ACK报文能够到达服务器，因为这个ACK报文可能丢失，站在服务器的角度看来，我已经发送了FIN+ACK报文请求断开了，客户端还没有给我回应，应该是我发送的请求断开报文它没有收到，于是服务器又会重新发送一次，而客户端就能在这个2MSL时间段内收到这个重传的报文，接着给出回应报文，并且会重启2MSL计时器。<br>第二，防止类似与“三次握手”中提到了的“已经失效的连接请求报文段”出现在本连接中。客户端发送完最后一个确认报文后，在这个2MSL时间中，就可以使本连接持续的时间内所产生的所有报文段都从网络中消失。这样新的连接中不会出现旧连接的请求报文。</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2018/09/08/socket_connect_close/" data-id="cla9j67jz000kxupihu2hecm5" class="article-share-link">
+        Share
+      </a>
+      
+<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/TCP-IP/" rel="tag">TCP&#x2F;IP</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+  
+<nav class="article-nav">
+  
+  <a href="/2018/09/12/threePool/" class="article-nav-link">
+    <strong class="article-nav-caption">Newer</strong>
+    <div class="article-nav-title">
+      
+      线程池笔记
+      
+    </div>
+  </a>
+  
+  
+  <a href="/2018/09/01/sortArithment/" class="article-nav-link">
+    <strong class="article-nav-caption">Older</strong>
+    <div class="article-nav-title">排序算法</div>
+  </a>
+  
+</nav>
+
+  
+
+  
+  
+  
+  
+
+</article>
+</section>
+    <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>小胡僧 &copy; 2022</li>
+      
+        <li>
+          
+            <a href="https://beian.miit.gov.cn/" target="_blank"></a>
+            
+        </li>
+      
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+    </ul>
+    
+  </div>
+</footer>
+  </main>
+  <aside class="sidebar">
+    <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/hexo.svg" alt="小胡僧"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories/">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/gallery/">相册</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about/">关于</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+  </aside>
+  
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+  });
+</script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+
+</html>

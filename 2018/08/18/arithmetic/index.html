@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+  <meta name="description" content="胡强的博客">
+  
+  <title>
+    算法小解 |
+    
+    小胡僧
+  </title>
+  <!-- Icon -->
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 6.2.0"><link rel="alternate" href="/atom.xml" title="小胡僧" type="application/atom+xml">
+</head>
+
+<body>
+  <main class="content">
+    <section class="outer">
+  <article id="post-arithmetic" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h1 class="article-title" itemprop="name">
+    算法小解
+  </h1>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2018/08/18/arithmetic/" class="article-date">
+  <time datetime="2018-08-18T08:50:01.000Z" itemprop="datePublished">2018-08-18</time>
+</a>
+      
+<div class="article-category">
+  <a class="article-category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+</div>
+
+    </div>
+    
+
+    
+    
+<div class="tocbot"></div>
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <blockquote>
+<p>算法题，每日一算,记录自己写过的算法题，</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="1，判断某序列是否是二叉搜索树的后续遍历序列"><a href="#1，判断某序列是否是二叉搜索树的后续遍历序列" class="headerlink" title="1，判断某序列是否是二叉搜索树的后续遍历序列"></a>1，判断某序列是否是二叉搜索树的后续遍历序列</h2><ul>
+<li>首先要看二叉搜索树的特性，及左边比根节点小，右边比根节点大</li>
+<li>先取序列的最后一个元素，即是该二叉搜索树的根节点，然后从头遍历该序列，知道某一元素比根节点大，然后从该节点开始，遍历如果出现比根节点小的数，那么就可以判断该序列不是二叉搜索树的后序遍历，依次遍历根节点的左子树和右子树，得出结果！</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public class VerifySquenceOfBST &#123;</span><br><span class="line"></span><br><span class="line">    boolean verifySquenceOfBST(int sequence[],int start,int end)&#123;</span><br><span class="line">        if(sequence == null || sequence.length &lt;= 0)</span><br><span class="line">            return false;</span><br><span class="line">     int root = sequence[end];</span><br><span class="line">     //在二叉搜索树中左子树节点值小于根节点值</span><br><span class="line">        int i = 0;</span><br><span class="line">        for (;i&lt;end;++i)&#123;</span><br><span class="line">            if(sequence[i] &gt; root)</span><br><span class="line">                break;</span><br><span class="line">        &#125;</span><br><span class="line">        //在二叉搜索树中右字数的值大于根节点的值</span><br><span class="line">        int j=i;</span><br><span class="line">        for(;j&lt;end;++j)&#123;</span><br><span class="line">            if(sequence[j] &lt; root)</span><br><span class="line">                return false;</span><br><span class="line">        &#125;</span><br><span class="line">        //判断左子树是不是二叉搜索树</span><br><span class="line">        boolean left = true;</span><br><span class="line">        if(i&gt;0)</span><br><span class="line">            left = verifySquenceOfBST(sequence,start,i);</span><br><span class="line">        boolean right = true;</span><br><span class="line">        //判断右子树是不是二叉搜索树</span><br><span class="line">        if(j&gt;0)</span><br><span class="line">            right = verifySquenceOfBST(sequence,i+1,end);</span><br><span class="line"></span><br><span class="line">        return(left &amp;&amp; right);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="2，求二叉树中所有路径值的和为某一整数的所有路径"><a href="#2，求二叉树中所有路径值的和为某一整数的所有路径" class="headerlink" title="2，求二叉树中所有路径值的和为某一整数的所有路径"></a>2，求二叉树中所有路径值的和为某一整数的所有路径</h2><ul>
+<li>首先一条路径都是从根路径开始的，所以我们可以从根节点开始遍历</li>
+<li>从根节点开始遍历的，我们可以想到前序遍历，这里我们采用前序遍历，先从根节<code>root</code>点开始，然后遍历<code>root.left</code> 然后节点值相加如果满足条件则该路径就是一条要查找的路径，一直遍历到叶子节点，如果都没有满足条件则递归返回父节点，然后遍历父节点的右子节点，再返回父节点的时候要删除序列中父节点的子节点值，然后依次递归！</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">   public class FindPath &#123;</span><br><span class="line">    private ArrayList&lt;ArrayList&lt;Integer&gt;&gt; listAll = new ArrayList&lt;&gt;();</span><br><span class="line">    private ArrayList&lt;Integer&gt; list = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    public ArrayList&lt;ArrayList&lt;Integer&gt;&gt; findPath(TreeNode root,int target)&#123;</span><br><span class="line">        if(root == null)</span><br><span class="line">            return listAll;</span><br><span class="line">        //把树的路径值放入list</span><br><span class="line">        list.add(root.val);</span><br><span class="line">        //target逐渐减去二叉树节点值，直到满足条件</span><br><span class="line">        target -= root.val;</span><br><span class="line">        //如果target为0且root为叶子节点</span><br><span class="line">        if(target == 0 )</span><br><span class="line">        listAll.add(new ArrayList&lt;&gt;(list));</span><br><span class="line">        //递归前序遍历</span><br><span class="line">        if(root.left != null)&#123;</span><br><span class="line">            findPath(root.left,target);</span><br><span class="line">        &#125;</span><br><span class="line">        if (root.right != null)&#123;</span><br><span class="line">            findPath(root.right,target);</span><br><span class="line">        &#125;</span><br><span class="line">        //返回父节点前，删除当前节点在序列中的值</span><br><span class="line">        list.remove(list.size()-1);</span><br><span class="line">        return listAll;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-复制复杂链表，该链表有指向下一个节点的next指针和指向任意节点的sibling指针"><a href="#3-复制复杂链表，该链表有指向下一个节点的next指针和指向任意节点的sibling指针" class="headerlink" title="3,复制复杂链表，该链表有指向下一个节点的next指针和指向任意节点的sibling指针"></a>3,复制复杂链表，该链表有指向下一个节点的next指针和指向任意节点的sibling指针</h2><ul>
+<li>分为三步，首先复制原始链表，把复制链表连接到原始链表后面，比如A-&gt;B-&gt;C-&gt;D 复制后变为A-&gt;A1-&gt;B-&gt;B1-&gt;C-&gt;C1-&gt;D-&gt;D1</li>
+<li>然后<code>A1.sibling = A.sibling.next</code>这样我们就可以复制完随机链表，现在复制链表和随机链表在一个链表上</li>
+<li>第三步，然后把链表拆分，奇数上的是原始链表，偶数上的是复制链表。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"> </span><br><span class="line">	public class CloneNodes &#123;</span><br><span class="line">	//第一步，辅助原始链表</span><br><span class="line">	 public void cloneNodes(ComplexListNode pHead) &#123;</span><br><span class="line">	     ComplexListNode pNode = pHead;</span><br><span class="line">	     while (pNode != null) &#123;</span><br><span class="line">	         ComplexListNode pClone = new ComplexListNode();</span><br><span class="line">	         pClone.val = pNode.val;</span><br><span class="line">	         pClone.next = pNode.next;</span><br><span class="line">	         pClone.sibling = null;</span><br><span class="line">	         pNode.next = pClone;</span><br><span class="line">	         pNode = pClone.next;</span><br><span class="line">	     &#125;</span><br><span class="line">	 &#125;</span><br><span class="line">	</span><br><span class="line">	 //第二步，复制随机链表</span><br><span class="line">	public void connectSibling(ComplexListNode pHead)&#123;</span><br><span class="line">	     ComplexListNode pNode = pHead;</span><br><span class="line">	     while(pNode != null)&#123;</span><br><span class="line">	         ComplexListNode pClone = pNode.next;</span><br><span class="line">	         if(pNode.sibling != null)&#123;</span><br><span class="line">	             pClone.sibling = pNode.sibling.next;</span><br><span class="line">	         &#125;</span><br><span class="line">	         pNode = pClone.next;</span><br><span class="line">	     &#125;</span><br><span class="line">	&#125;</span><br><span class="line">	&#125;</span><br><span class="line">     //第三步，拆分链表</span><br><span class="line">     public ComplexListNode reConnectNodes(ComplexListNode pHead)&#123;</span><br><span class="line">        ComplexListNode pNode = pHead;</span><br><span class="line">        ComplexListNode pCloneHead = null;</span><br><span class="line">        ComplexListNode pCloneNode = null;</span><br><span class="line">        if(pNode != null)&#123;</span><br><span class="line">            pCloneHead = pCloneNode =pNode.next;</span><br><span class="line">            pNode.next = pCloneNode.next; </span><br><span class="line">            pNode = pNode.next;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        while(pNode != null)&#123;</span><br><span class="line">            pCloneNode.next = pNode.next;</span><br><span class="line">            pCloneNode = pCloneNode.next;</span><br><span class="line">            pNode.next = pCloneNode.next;</span><br><span class="line">            pNode = pNode.next;</span><br><span class="line">        &#125;</span><br><span class="line">        return pCloneHead;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //整合</span><br><span class="line">    ComplexListNode clone(ComplexListNode pHead)&#123;</span><br><span class="line">        cloneNodes(pHead);</span><br><span class="line">        connectSibling(pHead);</span><br><span class="line">        return reConnectNodes(pHead);</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="4，数组中出现次数超过一半的数字"><a href="#4，数组中出现次数超过一半的数字" class="headerlink" title="4，数组中出现次数超过一半的数字"></a>4，数组中出现次数超过一半的数字</h2><ul>
+<li>数组中一个数字出现的次数超过数组长度的一半，说明这个数字出现的次数比其它数字出现次数的和还要大。我们在遍历数组的时候可以保存两个值，第一个是数字的值，第二个是数字出现的次数。保存第一个数字的值，给定出现次数为1，如果下一个数字和之前保存的数字相同，则次数加1，否则次数减1。如果次数为0，就保存下一个数字，且给次数赋值为1。因为要找的数字出现次数比其它数字出现次数的和还要大，所以最后保存的值以定就是我们要找的值。。。。。 </li>
+<li>比如：数组{1，2，3，2，2，2，5，4，2}   要找的数字就是2！    <ol>
+<li>我们在遍历的时候，先给定<code>result = 1</code>，<code>times = 1</code></li>
+<li>遍历到2的时候，<code>result = 2</code>，<code>times = 0</code> 所以这时候就要给result和times赋值,<code>result</code>为下个值及 <code>result = 3</code>，<code>times = 1</code></li>
+<li>依次遍历，最后的<code>result</code>就是我们要求的数字！</li>
+</ol>
+</li>
+</ul>
+<p> 代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">int checkMoreThanHalf(int[] numbers,int length)&#123;</span><br><span class="line">     if(numbers == null || length &lt;=0)</span><br><span class="line">         return 0;</span><br><span class="line">     int result =numbers[0];</span><br><span class="line">     int times = 1;</span><br><span class="line">     for(int i=1;i&lt;length;++i)&#123;</span><br><span class="line">         if(times == 0)&#123;</span><br><span class="line">             result = numbers[i];</span><br><span class="line">             times = 1;</span><br><span class="line">         &#125;</span><br><span class="line">         else if(numbers[i] == result)</span><br><span class="line">             times++;</span><br><span class="line">         else</span><br><span class="line">             times--;</span><br><span class="line">         </span><br><span class="line">     &#125;</span><br><span class="line">     return result;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="5，把整型数组排成最小的数"><a href="#5，把整型数组排成最小的数" class="headerlink" title="5，把整型数组排成最小的数"></a>5，把整型数组排成最小的数</h2><ul>
+<li><strong>分析</strong><br> 首先应该把整形数组转化成字符串数组，然后可以根据String的CompareTo方法和Comparator自定义比较方法—自定义比较方法为交换两个数所怕拼接的值，谁小谁排前面，<br> 比如一个数组[12,23,4] 比较1223和2312 2312&gt;1223所以12排在23前，234&lt;423,所以23排在4前，排序完数组为[12，23，4] 最小数为12234，<br> 代码如下：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">/*</span><br><span class="line">  调用Arrays方法</span><br><span class="line">sort(str,new Comparetor&lt;String&gt;()&#123;</span><br><span class="line">     public int compare(String o1,String o2)&#123;</span><br><span class="line">         //自定义比较逻辑        </span><br><span class="line">     &#125;  </span><br><span class="line">&#125;) </span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">public String PrintMinNumber(int[] numbers)&#123;</span><br><span class="line">    if(numbers == null || numbers.length &lt;=0)</span><br><span class="line">        return &quot;&quot;;</span><br><span class="line">    int len = numbers.length;</span><br><span class="line">    String[] str = new String[len];</span><br><span class="line">    StringBuilder sb = new StringBuilder();</span><br><span class="line">    //这里把int数组转换成String数组</span><br><span class="line">    for(int i=0;i&lt;len;i++)&#123;</span><br><span class="line">        str[i] = String.valueOf(numbers[i]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //comparable接口的compareTo 基于JDK1.7 String 根据字典顺序比较,</span><br><span class="line">    //comparator可以自定义比较方法,这里就是自定义了一个比较方法</span><br><span class="line">    Arrays.sort(str, new Comparator&lt;String&gt;() &#123;</span><br><span class="line">        @Override</span><br><span class="line">        public int compare(String o1, String o2) &#123;</span><br><span class="line">            String c1 = o1 +o2;</span><br><span class="line">            String c2 = o2 + o1;</span><br><span class="line">            return c1.compareTo(c2);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    for(int i=0;i&lt;len;i++)&#123;</span><br><span class="line">        sb.append(str[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    return sb.toString();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="6，数组中只出现一次的两个数字"><a href="#6，数组中只出现一次的两个数字" class="headerlink" title="6，数组中只出现一次的两个数字"></a>6，数组中只出现一次的两个数字</h2><p>#####一个整型数组中除了两个数之外，其它数都出现了二次，找出这两个只出现一次的数字###</p>
+<ul>
+<li>除了要找的两个数字，其它数都出现两次，可以使用异或^ </li>
+<li>A异或A等于0，A异或0等于A</li>
+<li>由此我们可以，依次异或数组的所有数，出现两次的数异或就为0</li>
+<li>得到一个二进制数，该二进制中为1的位数肯定大于等于1，找到其中一个为1的坐标<code>index</code></li>
+<li>把数组分为<code>index</code>为0和<code>index</code>为1的两个数组，再分别异或及得到要找的两个数字</li>
+</ul>
+<p>例如：输入数组<code>[2,4,3,6,3,2,5,5]</code>,依次异后得到二进制<code>0010</code>,该二进制中倒数第2个数字为1,于是根据二进制倒数第2个位置是否为1，把数组分为<code>[2,3,6,3,2]</code>二进制倒数第2都是1和<code>[4,5,5]</code>倒数第二个都是0，然后两个数组分别异或即位要求的只出现一次的数。</p>
+<p>代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">/*</span><br><span class="line">两个相同的数异或为0，一个数和0异或等于本身</span><br><span class="line"> */</span><br><span class="line">public  void findNumsAppearOnce(int[] array,int num1[],int num2[])&#123;</span><br><span class="line">    if(array == null || array.length &lt;2)</span><br><span class="line">        return;</span><br><span class="line">    int bitResult = 0;</span><br><span class="line">    for (int i=0;i&lt;array.length;i++)</span><br><span class="line">        bitResult ^= array[i];</span><br><span class="line">    //找二进制中第一个为1的位置</span><br><span class="line">    int index = findFirstBitIs1(bitResult);</span><br><span class="line">    for (int i=0;i&lt;array.length;i++)</span><br><span class="line">        if(isBit1(array[i],index))</span><br><span class="line">            num1[0] ^= array[i];</span><br><span class="line">        else</span><br><span class="line">            num2[0] ^= array[i];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//判断target,的第index位上是否为1</span><br><span class="line">private boolean isBit1(int target,int index)&#123;</span><br><span class="line">    return((target &gt;&gt; index) &amp; 1) == 1;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//查找二进制中第一个1的下标</span><br><span class="line">private int findFirstBitIs1(int num)&#123;</span><br><span class="line">    int indexBit = 0;</span><br><span class="line">    while((num &amp; 1) == 0 &amp;&amp; indexBit &lt;32)&#123;</span><br><span class="line">        indexBit++;</span><br><span class="line">        num &gt;&gt;=1;</span><br><span class="line">    &#125;</span><br><span class="line">    return indexBit;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="7，数字在排序数组中出现的次数"><a href="#7，数字在排序数组中出现的次数" class="headerlink" title="7，数字在排序数组中出现的次数"></a>7，数字在排序数组中出现的次数</h2><ul>
+<li>排序数组中找数字，排序，首先想到二分查找</li>
+<li>可以用二分查找找到数组中该数字的start,end</li>
+<li>end-start+1及为该数字出现的次数</li>
+</ul>
+<p>例子：输入一个排序数组[1,3,4,5,5,5,5,6,7,8],</p>
+<p>先找到第一个5的位置<code>start=3</code>,最后一个5出现的位置<code>end=6</code>,出现次数即为<code>end-start+1=4</code></p>
+<p>代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public int getNumberOfk(int[] array,int k)&#123;</span><br><span class="line">   int first,last;</span><br><span class="line">   first = getFirstIndex(array,0,array.length-1,k);</span><br><span class="line">   last = getLastIndex(array,0,array.length-1,k);</span><br><span class="line">   if(first &gt;-1 &amp;&amp; last &gt;-1)</span><br><span class="line">       return last-first+1;</span><br><span class="line">   return 0;</span><br><span class="line">&#125;</span><br><span class="line">//获得最后一个k</span><br><span class="line">private int getLastIndex(int[] array,int start,int end,int k)&#123;</span><br><span class="line">    int mid;</span><br><span class="line">    while(start &lt;= end)&#123;</span><br><span class="line">        mid = (start + end)/2;</span><br><span class="line">        if(k==array[mid])&#123;</span><br><span class="line">            if(mid == end || array[mid + 1] != k)</span><br><span class="line">                return mid;</span><br><span class="line">            else</span><br><span class="line">                start = mid + 1;</span><br><span class="line">        &#125;else if(k&lt;array[mid])</span><br><span class="line">            end = mid -1;</span><br><span class="line">         else</span><br><span class="line">             start = mid + 1;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    return -1;</span><br><span class="line"></span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> //获得第一个k</span><br><span class="line"> private int getFirstIndex(int[] array,int start,int end,int k) &#123;</span><br><span class="line">    int mid;</span><br><span class="line">    while (start &lt;= end) &#123;</span><br><span class="line">        mid = (start + end) / 2;</span><br><span class="line">        if (k == array[mid]) &#123;</span><br><span class="line">            if (k != array[mid - 1] || mid == start)</span><br><span class="line">                return mid;</span><br><span class="line">            else</span><br><span class="line">                start = mid - 1;</span><br><span class="line">        &#125; else if (k &lt; array[mid]) &#123;</span><br><span class="line">            end = mid - 1;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            start = mid + 1;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  return -1;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="8，和为S的连续正数序列（至少含有两个数）"><a href="#8，和为S的连续正数序列（至少含有两个数）" class="headerlink" title="8，和为S的连续正数序列（至少含有两个数）"></a>8，和为S的连续正数序列（至少含有两个数）</h2><ul>
+<li>我们可以先设两个数<code>small=1,big=2</code>,<code>small</code>为序列最小值，<code>big</code>为序列最大值</li>
+<li>如果<code>small+big&lt;S</code>那么<code>big+1</code>,序列为<code>1，2，3</code>,序列相加还是小与S，<code>big</code>再加1，序列为<code>1,2,3,4</code>,直到等于S</li>
+<li>如果序列相加大于S那么<code>small</code>就+1，及序列由<code>1,2,3,4</code>变为<code>2,3,4</code></li>
+<li>结束条件为<code>small&gt;=(S+1)/2</code></li>
+</ul>
+<p>代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"> public ArrayList&lt;ArrayList&lt;Integer&gt;&gt; findContinuousSequence(int sum)&#123;</span><br><span class="line">    ArrayList&lt;ArrayList&lt;Integer&gt;&gt; res = new ArrayList&lt;&gt;();</span><br><span class="line">    if(sum &lt;3)</span><br><span class="line">        return res;</span><br><span class="line">    //初始化small=1,big=2</span><br><span class="line">    int small = 1;</span><br><span class="line">    int big = 1;</span><br><span class="line">    int middle = (1+sum)/2;</span><br><span class="line">    while(small &lt; middle)&#123;</span><br><span class="line">        int cueSum = sumOfList(small,big);</span><br><span class="line">        if(cueSum == sum)&#123;</span><br><span class="line">            //把这个序列放入ArrayList,big加1</span><br><span class="line">            ArrayList&lt;Integer&gt; list = new ArrayList&lt;&gt;();</span><br><span class="line">            for(int i=small;i&lt;big;i++)</span><br><span class="line">                list.add(i);</span><br><span class="line">            res.add(list);</span><br><span class="line">            big++;</span><br><span class="line">        &#125;else if(cueSum &lt;sum)</span><br><span class="line">            big++;</span><br><span class="line">        else</span><br><span class="line">            small++;</span><br><span class="line">    &#125;</span><br><span class="line">    return res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//计算list内数之和</span><br><span class="line">private int sumOfList(int small,int big)&#123;</span><br><span class="line">    int sum = 0;</span><br><span class="line">    for(int i=small;i&lt;=big;i++)</span><br><span class="line">        sum += i;</span><br><span class="line">    return sum;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//计算list内数之和</span><br><span class="line">private int sumOfList(int small,int big)&#123;</span><br><span class="line">    int sum = 0;</span><br><span class="line">    for(int i=small;i&lt;=big;i++)</span><br><span class="line">        sum += i;</span><br><span class="line">    return sum;</span><br><span class="line">&#125;</span><br><span class="line">   </span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="9-左旋转字符串"><a href="#9-左旋转字符串" class="headerlink" title="9,左旋转字符串"></a>9,左旋转字符串</h2><p> 字符串左旋转操作是把字符串前面的若干个字符转移到字符串的尾部，比如：输入字符串<code>abcdefg</code>和数字<code>2</code>,该函数将返回左旋转两位得到的结果<code>cdefgab</code></p>
+<ul>
+<li>旋转字符串，且要保持字符串的顺序不变，可以把字符串分为两部分，比如字符<code>abcdefg</code>和数字n,第一部分为<code>0-n-1</code>下标的字符，第二部分为剩余字符串，分别翻转这两部分字符串，再翻转整个字符串，即得到结果！</li>
+</ul>
+<p>代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public String rotateString(String str,int n) &#123;</span><br><span class="line">    if (str == null || str.trim().length() &lt;= 0 || n &lt; 0 || n &gt; str.trim().length())</span><br><span class="line">        return str;</span><br><span class="line">    char[] chars = str.toCharArray();</span><br><span class="line">    int len = str.length();</span><br><span class="line">    //旋转字符串前n个字符</span><br><span class="line">    reverse(chars,0,n-1);</span><br><span class="line">    //旋转字符后面的部分</span><br><span class="line">    reverse(chars,n,len-1);</span><br><span class="line">    //旋转整个字符串</span><br><span class="line">    reverse(chars,0,len-1);</span><br><span class="line">    return String.valueOf(chars);</span><br><span class="line">&#125;</span><br><span class="line">//翻转字符串  </span><br><span class="line">private void reverse(char[] chars,int i,int j)&#123;</span><br><span class="line">    while(i&lt;j)&#123;</span><br><span class="line">        char temp = chars[i];</span><br><span class="line">        chars[i] = chars[j];</span><br><span class="line">        chars[j] = temp;</span><br><span class="line">        i++;</span><br><span class="line">        j--;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="10-翻转字符串"><a href="#10-翻转字符串" class="headerlink" title="10,翻转字符串"></a>10,翻转字符串</h2><p>输入一个英文句子，翻转句子中单词的顺序，但单词内得字符得顺序不变，比如：输入字符串<code>I am a student</code>，则输出<code>student a am I</code></p>
+<ul>
+<li>这一题和9题得思路是一样得，首选分别翻转整个句子，然后翻转每个单词，用空格来区分每个单词</li>
+</ul>
+<p>代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public String reverseTwo(String str)&#123;</span><br><span class="line">    if(str == null || str.trim().length() &lt;= 0)</span><br><span class="line">        return str;</span><br><span class="line">    char[] chars = str.toCharArray();</span><br><span class="line">    //翻转整个句子</span><br><span class="line">    String res = reverse(chars,0,chars.length-1);</span><br><span class="line">    //翻转每个单词</span><br><span class="line">    String[] strs = res.split(&quot; &quot;);</span><br><span class="line">    for (int i =0;i&lt;=strs.length-1;i++)&#123;</span><br><span class="line">       reverse(strs[i].toCharArray(),0,strs[i].toCharArray().length-1);</span><br><span class="line">       if(i&lt;strs.length-1)&#123;</span><br><span class="line">           strs[i] = strs[i] + &quot; &quot;;</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return res;</span><br><span class="line">&#125;</span><br><span class="line">private String reverse(char[] chars,int i,int j)&#123;</span><br><span class="line">    while(i&lt;j)&#123;</span><br><span class="line">        char temp = chars[i];</span><br><span class="line">        chars[i] = chars[j];</span><br><span class="line">        chars[j] = temp;</span><br><span class="line">        i++;</span><br><span class="line">        j--;</span><br><span class="line">    &#125;</span><br><span class="line">    return chars.toString();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p> 还有一种解法，new一个StringBUffer,然后从头到尾依次把每个单词append到buffer,然后转化为字符串<br>代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"> public String reverseTwo(String str)&#123;</span><br><span class="line">    if(str == null || str.trim().length() &lt;= 0)</span><br><span class="line">        return str;</span><br><span class="line">    char[] chars = str.toCharArray();</span><br><span class="line">    //翻转整个句子</span><br><span class="line">    String res = reverse(chars,0,chars.length-1);</span><br><span class="line">    //翻转每个单词</span><br><span class="line">    String[] strs = res.split(&quot; &quot;);</span><br><span class="line">    for (int i =0;i&lt;=strs.length-1;i++)&#123;</span><br><span class="line">       reverse(strs[i].toCharArray(),0,strs[i].toCharArray().length-1);</span><br><span class="line">       if(i&lt;strs.length-1)&#123;</span><br><span class="line">           strs[i] = strs[i] + &quot; &quot;;</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return res;</span><br><span class="line">&#125;</span><br><span class="line">private String reverse(char[] chars,int i,int j)&#123;</span><br><span class="line">    while(i&lt;j)&#123;</span><br><span class="line">        char temp = chars[i];</span><br><span class="line">        chars[i] = chars[j];</span><br><span class="line">        chars[j] = temp;</span><br><span class="line">        i++;</span><br><span class="line">        j--;</span><br><span class="line">    &#125;</span><br><span class="line">    return chars.toString();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="11-扑克牌中的顺子"><a href="#11-扑克牌中的顺子" class="headerlink" title="11,扑克牌中的顺子"></a>11,扑克牌中的顺子</h2><p>从扑克牌中随机抽取5张牌，判断是不是一个顺子，即这5张牌是不是连续的，2-10为数字本身，A为1，J为11，Q为12，K为13，大小王可以看成任意数字。</p>
+<ul>
+<li>我们把大小王看成数字0,这样不会与其他数字冲突，</li>
+<li>把抽取的5张牌放入数组中，把数组排序</li>
+<li>遍历查找数组中0的个数<code>numberOfZero</code>，即大小王的个数，</li>
+<li>遍历查找相邻数字之间的差值<code>numberOfGap</code></li>
+<li>因为大小王可以表示任意数字，只要<code>numberOfZero</code>&gt;&#x3D;<code>numberOfGap</code>，就代表大小王可以填补所有不连续数字</li>
+<li>实时上numberOfZero &gt;&#x3D; 2</li>
+</ul>
+<p>代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Boolean isContinuous(int[] numbers,int length)&#123;</span><br><span class="line">    if(numbers == null || length != 5)</span><br><span class="line">        return false;</span><br><span class="line">    Arrays.sort(numbers);</span><br><span class="line">    int numberOfZero = 0;</span><br><span class="line">    int numberOfGap = 0;</span><br><span class="line">    //统计数组中0的个数</span><br><span class="line">    for(int i=0;i&lt;length&amp;&amp;numbers[i] == 0;++i)</span><br><span class="line">        ++numberOfZero;</span><br><span class="line"></span><br><span class="line">    //统计数组中间隔数目</span><br><span class="line">    int small = numberOfZero;</span><br><span class="line">    int big = small+1;</span><br><span class="line">    while(big&lt;length)&#123;</span><br><span class="line">        //两个数相等，有对子，不可能是顺子</span><br><span class="line">        if(numbers[small] == numbers[big])</span><br><span class="line">            return false;</span><br><span class="line">        numberOfGap += numbers[big] - numbers[small] -1;</span><br><span class="line">        small = big;</span><br><span class="line">        ++big;</span><br><span class="line">    &#125;</span><br><span class="line">    return numberOfGap &gt;= numberOfZero;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br></pre></td></tr></table></figure>
+
+<h2 id="12，圆圈中最后剩下的数字"><a href="#12，圆圈中最后剩下的数字" class="headerlink" title="12，圆圈中最后剩下的数字"></a>12，圆圈中最后剩下的数字</h2><p>  <strong>约瑟夫环问题</strong><br>0，1，2…,n-1这n个数字排成一个圆圈，从数字0开始，每次从这个圆圈里删除第m个数字。求出这个圆圈里剩下的最后一个数字</p>
+<ul>
+<li>用环形链表模拟圆圈</li>
+<li>从0开始，第一次删除的是下标为m-1的数，第二次删除的是下标为m-1+m-1的数</li>
+<li>设bt &#x3D; 0;循环链表每次删除下标为bt &#x3D; bt+m-1的数，直到最后一个数</li>
+</ul>
+<p>代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">    </span><br><span class="line"> public int lastRemaining(int n ,int m)&#123;</span><br><span class="line">//使用链表模拟，使用LinkList</span><br><span class="line">LinkedList&lt;Integer&gt; list = new LinkedList&lt;Integer&gt;();</span><br><span class="line">for (int i=0;i&lt;=n;++i)&#123;</span><br><span class="line">    list.add(i);</span><br><span class="line">&#125;</span><br><span class="line">int bt=0;</span><br><span class="line">while(list.size()&gt;1)&#123;</span><br><span class="line">    bt = (bt+m-1)%list.size();</span><br><span class="line">    list.remove(bt);</span><br><span class="line">&#125;</span><br><span class="line">return list.size() == 1? list.get(0):-1;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="13，remove排序链表中重复的节点"><a href="#13，remove排序链表中重复的节点" class="headerlink" title="13，remove排序链表中重复的节点"></a>13，remove排序链表中重复的节点</h2><ul>
+<li>因为是去除链表中重复的节点，所以要保证去除重复节点后，链表还是连接的</li>
+<li>这里先new一个节点作为链表的前驱节点，</li>
+<li>定义两个节点，pre，cur，cur为遍历删除重复节点时，节点的位置，pre永远是cur的前驱节点</li>
+<li>首先pre指向new的那个前驱节点，cur为head节点，然后遍历链表，如果有重复的节点，删除重复节点，cur指向删除节点的下一个节点，pre.next &#x3D; cur，如果没有重复的节点，依次向前移动<br>代码如下：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public ListNode remove(ListNode head)&#123;</span><br><span class="line">    if(head == null) return null;</span><br><span class="line">    //新建一个节点当作链表的前驱节点</span><br><span class="line">    ListNode tempHead = new ListNode(0);</span><br><span class="line">    tempHead.next = head;</span><br><span class="line">    ListNode pre = tempHead;</span><br><span class="line">    ListNode cur = head;</span><br><span class="line">    while(cur != null)&#123;</span><br><span class="line">        while(cur.next != null &amp;&amp; cur.val == cur.next.val)&#123;</span><br><span class="line">            cur = cur.next;</span><br><span class="line">        &#125;</span><br><span class="line">        if(pre.next == cur)&#123;</span><br><span class="line">            pre = pre.next;</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            pre.next = cur.next;</span><br><span class="line">        &#125;</span><br><span class="line">        cur = cur.next;</span><br><span class="line">    &#125;</span><br><span class="line">    return tempHead.next;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="14，求字符串的最长不重复子串"><a href="#14，求字符串的最长不重复子串" class="headerlink" title="14，求字符串的最长不重复子串"></a>14，求字符串的最长不重复子串</h2><p>例：输入abcabcbb，输出3，因为abcabcbb最长不重复字串为abc，长度为3.</p>
+<ul>
+<li>最长不重复子串，定义一个HashSet数据结构存储数据</li>
+<li>从头遍历字符串，如果HashSet里没有，就添加到HashSet中，记录每次HashSet与max的最大值。</li>
+<li>如果HashSet中有这个字符，从头开始遍历字符串，从HashSet中删除遍历的字符直到HashSet中没有这个字符。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"> public int longestSubstring(String s)&#123;</span><br><span class="line">   //因为是不重复，所以这里可以用一个hashSet存放数据</span><br><span class="line">    HashSet&lt;Character&gt; set = new HashSet&lt;&gt;();</span><br><span class="line">    int i = 0;</span><br><span class="line">    int j =0;</span><br><span class="line">    int max = 0;</span><br><span class="line">    while(i&lt;s.length())&#123;</span><br><span class="line">        if(!set.contains(s.charAt(i)))&#123;</span><br><span class="line">            set.add(s.charAt(i++));</span><br><span class="line">            max = Math.max(max,set.size());</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            set.remove(s.charAt(j++));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return max;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="15-求二叉树的深度和宽度"><a href="#15-求二叉树的深度和宽度" class="headerlink" title="15,求二叉树的深度和宽度"></a>15,求二叉树的深度和宽度</h2><ul>
+<li>求二叉树的深度和宽度</li>
+<li>非递归下，可以层次遍历，然后用队列保存每一层的数据，</li>
+<li>每次下一层入队时，就删除队列的值，记录每层的最大值就是宽度，记录下每次遍历，遍历到最后一层，就可以知道高度。</li>
+</ul>
+<p>代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">  /*</span><br><span class="line">   二叉树的高度</span><br><span class="line">  */</span><br><span class="line">  public int deepOfThree(TreeNode root)&#123;</span><br><span class="line">    if(root == null) return -1;</span><br><span class="line">    int height = 0;</span><br><span class="line">    int width = 0;</span><br><span class="line">    Queue&lt;TreeNode&gt; queue = new ArrayDeque&lt;&gt;();</span><br><span class="line">    queue.add(root);</span><br><span class="line">    while(!queue.isEmpty())&#123;</span><br><span class="line">        width = queue.size();</span><br><span class="line">        height++;</span><br><span class="line">        while(width &gt;0)&#123;</span><br><span class="line">            TreeNode t = queue.remove();</span><br><span class="line">            width--;</span><br><span class="line">            if(t.left != null)&#123;</span><br><span class="line">                queue.add(t.left);</span><br><span class="line">            &#125;</span><br><span class="line">            if(t.right != null)&#123;</span><br><span class="line">                queue.add(t.right);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return height;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> 二叉树的宽度</span><br><span class="line">*/</span><br><span class="line">public int widthOfThree(TreeNode root)&#123;</span><br><span class="line">    if(root == null) return -1;</span><br><span class="line">    int width = 0;</span><br><span class="line">    int maxWidth = 0;</span><br><span class="line">    Queue&lt;TreeNode&gt; queue = new ArrayDeque&lt;&gt;();</span><br><span class="line">    queue.add(root);</span><br><span class="line">    while(!queue.isEmpty())&#123;</span><br><span class="line">        width = queue.size();</span><br><span class="line">        maxWidth = Math.max(width,maxWidth);</span><br><span class="line">        while(width &gt;0)&#123;</span><br><span class="line">            TreeNode t = queue.remove();</span><br><span class="line">            width--;</span><br><span class="line">            if(t.left != null)&#123;</span><br><span class="line">                queue.add(t.left);</span><br><span class="line">            &#125;</span><br><span class="line">            if(t.right != null)&#123;</span><br><span class="line">                queue.add(t.right);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return maxWidth;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2018/08/18/arithmetic/" data-id="cla9j67jp0003xupievh24rtm" class="article-share-link">
+        Share
+      </a>
+      
+<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+  
+<nav class="article-nav">
+  
+  <a href="/2018/09/01/sortArithment/" class="article-nav-link">
+    <strong class="article-nav-caption">Newer</strong>
+    <div class="article-nav-title">
+      
+      排序算法
+      
+    </div>
+  </a>
+  
+  
+  <a href="/2018/07/01/arrayList_vector/" class="article-nav-link">
+    <strong class="article-nav-caption">Older</strong>
+    <div class="article-nav-title">ArrayList/Vector</div>
+  </a>
+  
+</nav>
+
+  
+
+  
+  
+  
+  
+
+</article>
+</section>
+    <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>小胡僧 &copy; 2022</li>
+      
+        <li>
+          
+            <a href="https://beian.miit.gov.cn/" target="_blank"></a>
+            
+        </li>
+      
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+    </ul>
+    
+  </div>
+</footer>
+  </main>
+  <aside class="sidebar">
+    <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/hexo.svg" alt="小胡僧"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories/">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/gallery/">相册</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about/">关于</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+  </aside>
+  
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+  });
+</script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+
+</html>

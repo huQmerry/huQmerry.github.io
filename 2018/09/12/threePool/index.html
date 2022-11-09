@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+  <meta name="description" content="胡强的博客">
+  
+  <title>
+    线程池笔记 |
+    
+    小胡僧
+  </title>
+  <!-- Icon -->
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 6.2.0"><link rel="alternate" href="/atom.xml" title="小胡僧" type="application/atom+xml">
+</head>
+
+<body>
+  <main class="content">
+    <section class="outer">
+  <article id="post-threePool" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h1 class="article-title" itemprop="name">
+    线程池笔记
+  </h1>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2018/09/12/threePool/" class="article-date">
+  <time datetime="2018-09-12T10:43:01.000Z" itemprop="datePublished">2018-09-12</time>
+</a>
+      
+<div class="article-category">
+  <a class="article-category-link" href="/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B/">多线程</a>
+</div>
+
+    </div>
+    
+
+    
+    
+<div class="tocbot"></div>
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <blockquote>
+<p>对线程池实现的总结以及各种阻塞队列的作用和区别</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="使用线程池带来的好处"><a href="#使用线程池带来的好处" class="headerlink" title="使用线程池带来的好处"></a>使用线程池带来的好处</h2><ul>
+<li>大家都知道，线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以对线程进行统一分配管理。java中几乎所有的异步或并发执行任务的程序都可以使用线程池</li>
+<li>合理的使用线程池可以带来三个好处   <ul>
+<li>降低资源消耗，通过重复利用已创建的线程降低线程创建和销毁造成的消耗</li>
+<li>提高相应速度，任务到达时可以不需要等到线程创建就可以立即执行</li>
+<li>提高线程的可管理性，使用线程池可以对线程统一分配，调优，监控，使线程的使用更加的可控</li>
+</ul>
+</li>
+</ul>
+<h2 id="线程池实现原理"><a href="#线程池实现原理" class="headerlink" title="线程池实现原理"></a>线程池实现原理</h2><ul>
+<li>当向线程池提交一个任务后，线程池是如何处理这个任务的？？？</li>
+</ul>
+<p><img src="https://i.imgur.com/kpjd2oP.jpg"></p>
+<p>  如上方执行示意图：</p>
+<ul>
+<li><p>ThreadPoolExector执行execute方法分为下面4种情况 </p>
+<ol>
+<li>线程池在执行一个任务的时候， 如果当前运行的线程少于corePoolSize,则创建新线程来执行任务（需要获取全局锁）</li>
+<li>如果运行的线程多于或等于corePoolSize，则将任务加入BlockingQueue</li>
+<li>如果无法将任务加入BlockingQueue（队列已满），则将创建新的线程来执行任务（需要获取全局锁）</li>
+<li>如果创建新的线程使当前线程超出maximumPoolSize，则任务将被拒绝，并调用RejectExectionHandler.rejectedExection()</li>
+</ol>
+</li>
+</ul>
+<p>threadPoolExecutor采用上述步骤的总体设计思路，是为了在执行exector的时候尽量避免获取全局锁（一个严重的可伸缩瓶颈）。在threadPoolExector预热之后（当前运行的线程数大于等于corePoolSize），几乎所有的execute()方法都都是执行步骤2，而步骤2是不需要获取全局锁的    </p>
+<h2 id="线程池的使用"><a href="#线程池的使用" class="headerlink" title="线程池的使用"></a>线程池的使用</h2><p>可以通过threadPoolExecutor来创建一个线程池<br><code>new ThreadPoolExecutor(corePoolSize,maximumPoolSize,keepAliveTime,         milliseconds,runnableTaskQueue,handler);</code>  </p>
+<p>参数说明：</p>
+<ul>
+<li><p>corePoolSize(线程池的基本大小):当提交一个任务到线程池时，线程会创建一个线程执行任务，即使核心线程池有空闲线程，也会执行新的线程，当线程大于corePoolSize时就不会再创建。如果调用了prestartAllCoreThreads()方法，线程池会提前创建并启动所有基本线程</p>
+</li>
+<li><p>runnableTaskQueue（任务队列）:用于保存等待执行的任务的阻塞队列，关于阻塞队列</p>
+<ol>
+<li>ArrayBlockingQueue:是一个基于数组结构的有界阻塞队列，此队列按FIFO原则对元素排序</li>
+<li>LinkedBlockingQueue:是一个基于链表结构的有界队列，此队列按照FIFO排序元素吞吐量高于ArrayBlockingQUeue,Executors.newFixedThreadPool()就是使用的这个队列，默认和最大长度为integer.MAX_VALUE</li>
+<li>SynchronousQueue:一个不存储元素的阻塞队列，每个插入操作必须等到另一个线程调用移除操作，否则插入操作一直处于阻塞状态，静态工厂方法Executors.newCachedThreadPool使用了这个队列</li>
+<li>PriorityBlockingQueue是一个支持优先级的无界阻塞队列，默认情况下元素采用自然顺序升序排序，当然也可以自定义排序规则</li>
+</ol>
+</li>
+<li><p>maximumPoolSize(线程池最大数量)：线程池允许创建的最大线程数，如果使用了无界任务队列，这个参数就没什么效果</p>
+</li>
+<li><p>rejectedExecutionhandler(饱和策略):当队列和线程池都满了，说明线程池处于饱和状态，那么就需要采用饱和策略处理提交的任务。这个策略默认情况下是AbortPolicy,表示无法处理新任务时抛出异常，jdk1.5以后有如下策略：</p>
+<ol>
+<li>AbortPolicy：直接抛出异常</li>
+<li>disCardPolicy:不处理，丢弃掉</li>
+<li>DisCardOldestPolicy:丢弃队列种最近的一个任务，并执行当前任务</li>
+<li>callerRunsPolicy:只用调用者所在线程来运行任务</li>
+</ol>
+</li>
+<li><p>keepAliveTime(线程活动保持时间):线程池的工作线程空闲后，保持存活的时间</p>
+</li>
+<li><p>TimeUnit(线程存活的时间单位)：</p>
+</li>
+</ul>
+<h2 id="向线程池提交任务和关闭线程池"><a href="#向线程池提交任务和关闭线程池" class="headerlink" title="向线程池提交任务和关闭线程池"></a>向线程池提交任务和关闭线程池</h2><ul>
+<li><p>可以使用两个方法向线程池提交任务，分别为execute()和submit()</p>
+<ul>
+<li>execute方法用于提交不需要返回值的任务，所以无法判断任务是否被线程池执行成功</li>
+<li>submit方法用于提交需要返回值的任务，线程池会返回一个future类型的对象，通过调用future对象的get()方法来获取返回值，get()方法会阻塞当前线程直到任务完成，也可以使用get(long TimeOut,TimeUnit unit)会阻塞线程一段时间然后返回。</li>
+</ul>
+</li>
+<li><p>可以调用线程池的shutdown和shutdown方法来关闭线程池，</p>
+<ul>
+<li>shutdownNow将线程池的状态设置成stop，然后尝试停止所有正在执行或者暂停的线程，返回等待执行任务的列表</li>
+<li>shutdown将线程池的状态设置成shutdown，然后中断没有执行任务的线程</li>
+</ul>
+</li>
+</ul>
+<h2 id="Executors工厂类"><a href="#Executors工厂类" class="headerlink" title="Executors工厂类"></a>Executors工厂类</h2><p>ThreadPoolExecutor通常使用工厂类Executors创建，Executors可以创建3种类型的ThreadPoolExecutor:SingleThreadExecutor,FixedThreadPool和CachedThreadPool。 </p>
+<ul>
+<li><p>FixedThreadPool详解</p>
+<ul>
+<li>FixedThreadPool使用无界队列LinkBlockingQueue作为线程池的工作队列(队列容量为Integer.MAX_VALUE)。使用无界队列时maximuPoolSize是一个无效参数。</li>
+<li>FixedThreadPool的corePoolSize和maximumPoolSize都被设置为创建FixedPoolThread时指定的参数nThreads。keepAliveTime被设置为0L,意味着多余的空闲线程会被立即终止。</li>
+<li>FixedThreadPool被称为固定线程数的线程池，源代码：</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public static ExecutorService newFixedThreadPool(int nThreads) &#123;</span><br><span class="line">   return new ThreadPoolExecutor(nThreads, nThreads,</span><br><span class="line">      0L, TimeUnit.MILLISECONDS,new LinkedBlockingQueue&lt;Runnable&gt;());</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>流程图<br><img src="https://i.imgur.com/IlXEDbG.png"></p>
+</li>
+<li><p>SingleThreadExecutor详解</p>
+<ul>
+<li>SingleThreadExecutor的corePoolSize和maximumPoolSize被设置为1,使用无界队列LinkBlockingQueue作为线程池的工作队列(队列容量为Integer.MAX_VALUE)</li>
+<li>如果当前线程小于corePoolSize(即线程池中无线程)，创建一个线程来执行任务，如果有一个线程，则将任务加入LinkBlockingQuque,线程执行完后会循环从队列中获取任务执行。</li>
+<li>SingleThreadExecutor是使用单个worker线程的Executor,源码：</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public static ExecutorService newSingleThreadExecutor() &#123;</span><br><span class="line">   return new FinalizableDelegatedExecutorService</span><br><span class="line">       (new ThreadPoolExecutor(1, 1,</span><br><span class="line">                               0L, TimeUnit.MILLISECONDS,</span><br><span class="line">                               new LinkedBlockingQueue&lt;Runnable&gt;()));</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>流程图<br><img src="https://i.imgur.com/UyXk43R.png">  </p>
+</li>
+<li><p>CachedThreadPool详解</p>
+<ul>
+<li>corePoolSize设置为0，maximumPoolSize设置为integer.MAX_VALUE,即maximumPoolSize是无界的，</li>
+<li>CachedThreadPool使用没有容量的SynchronousQueue作为线程池的工作队列</li>
+<li>在极端情况下，即提交任务的速度高于maximumPool中线程处理的熟读时，CachedPoolThread会不断创建线程，耗尽cpu和内存资源</li>
+<li>CachedThreadPool是一个会根据需要创建线程的线程池，源码如下：</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public static ExecutorService newCachedThreadPool() &#123;</span><br><span class="line">    return new ThreadPoolExecutor(0, Integer.MAX_VALUE,</span><br><span class="line">                                  60L, TimeUnit.SECONDS,</span><br><span class="line">                                  new SynchronousQueue&lt;Runnable&gt;());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>流程图：<br><img src="https://i.imgur.com/ravLVcd.png"></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2018/09/12/threePool/" data-id="cla9j67jy000fxupi5p3fhpyy" class="article-share-link">
+        Share
+      </a>
+      
+<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/threadPool/" rel="tag">threadPool</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+  
+<nav class="article-nav">
+  
+  <a href="/2019/03/02/countDownLatch_semaphore_cyclicBarrier/" class="article-nav-link">
+    <strong class="article-nav-caption">Newer</strong>
+    <div class="article-nav-title">
+      
+      JUC中的同步方法
+      
+    </div>
+  </a>
+  
+  
+  <a href="/2018/09/08/socket_connect_close/" class="article-nav-link">
+    <strong class="article-nav-caption">Older</strong>
+    <div class="article-nav-title">三次握手，四次挥手详解</div>
+  </a>
+  
+</nav>
+
+  
+
+  
+  
+  
+  
+
+</article>
+</section>
+    <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>小胡僧 &copy; 2022</li>
+      
+        <li>
+          
+            <a href="https://beian.miit.gov.cn/" target="_blank"></a>
+            
+        </li>
+      
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+    </ul>
+    
+  </div>
+</footer>
+  </main>
+  <aside class="sidebar">
+    <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/hexo.svg" alt="小胡僧"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories/">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/gallery/">相册</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about/">关于</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+  </aside>
+  
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+  });
+</script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+
+</html>

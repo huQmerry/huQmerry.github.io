@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>小胡僧</title>
+  <icon>http://example.com/icon.png</icon>
+  <subtitle>爱coding|爱美食|爱猫|爱一切</subtitle>
+  <link href="http://example.com/atom.xml" rel="self"/>
+  
+  <link href="http://example.com/"/>
+  <updated>2022-11-09T02:53:13.824Z</updated>
+  <id>http://example.com/</id>
+  
+  <author>
+    <name>jerryqhu</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>spring boot学习</title>
+    <link href="http://example.com/2020/01/09/Spring%20Boot%E7%AC%94%E8%AE%B0/"/>
+    <id>http://example.com/2020/01/09/Spring%20Boot%E7%AC%94%E8%AE%B0/</id>
+    <published>2020-01-09T10:43:01.000Z</published>
+    <updated>2022-11-09T02:53:13.824Z</updated>
+    
+    
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;springBoot学习总结&lt;/p&gt;
+&lt;/blockquote&gt;</summary>
+    
+    
+    
+    <category term="spring boot" scheme="http://example.com/categories/spring-boot/"/>
+    
+    
+    <category term="spring boot" scheme="http://example.com/tags/spring-boot/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>MySQL索引初探</title>
+    <link href="http://example.com/2019/12/02/mysql%20index/"/>
+    <id>http://example.com/2019/12/02/mysql%20index/</id>
+    <published>2019-12-02T10:43:01.000Z</published>
+    <updated>2022-11-09T02:50:57.424Z</updated>
+    
+    
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;MySQL索引初探&lt;/p&gt;
+&lt;/blockquote&gt;</summary>
+    
+    
+    
+    <category term="mysql" scheme="http://example.com/categories/mysql/"/>
+    
+    
+    <category term="mysql" scheme="http://example.com/tags/mysql/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JUC中的同步方法</title>
+    <link href="http://example.com/2019/03/02/countDownLatch_semaphore_cyclicBarrier/"/>
+    <id>http://example.com/2019/03/02/countDownLatch_semaphore_cyclicBarrier/</id>
+    <published>2019-03-02T10:43:01.000Z</published>
+    <updated>2022-11-09T03:10:04.509Z</updated>
+    
+    
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;对Java并发包中的同步方法&lt;code&gt;CountDownLatch&lt;/code&gt;,&lt;code&gt;Semaphore&lt;/code&gt;,&lt;code&gt;CyclicBarrier&lt;/code&gt;进行说明和举例&lt;/p&gt;
+&lt;/blockquote&gt;</summary>
+    
+    
+    
+    <category term="多线程" scheme="http://example.com/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"/>
+    
+    
+    <category term="java" scheme="http://example.com/tags/java/"/>
+    
+    <category term="JUC" scheme="http://example.com/tags/JUC/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>线程池笔记</title>
+    <link href="http://example.com/2018/09/12/threePool/"/>
+    <id>http://example.com/2018/09/12/threePool/</id>
+    <published>2018-09-12T10:43:01.000Z</published>
+    <updated>2022-11-09T03:08:40.254Z</updated>
+    
+    
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;对线程池实现的总结以及各种阻塞队列的作用和区别&lt;/p&gt;
+&lt;/blockquote&gt;</summary>
+    
+    
+    
+    <category term="多线程" scheme="http://example.com/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"/>
+    
+    
+    <category term="threadPool" scheme="http://example.com/tags/threadPool/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>三次握手，四次挥手详解</title>
+    <link href="http://example.com/2018/09/08/socket_connect_close/"/>
+    <id>http://example.com/2018/09/08/socket_connect_close/</id>
+    <published>2018-09-08T14:30:01.000Z</published>
+    <updated>2022-11-09T02:51:37.478Z</updated>
+    
+    
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;总结一下TCP&amp;#x2F;IP中三次握手和四次挥手的实现过程和各种状态，以及为什么要三次握手，四次挥手，四次挥手中为什么会有time_wait&amp;#x3D;2MSL等一些问题…..&lt;/p&gt;
+&lt;/blockquote&gt;</summary>
+    
+    
+    
+    <category term="TCP/IP" scheme="http://example.com/categories/TCP-IP/"/>
+    
+    
+    <category term="TCP/IP" scheme="http://example.com/tags/TCP-IP/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>排序算法</title>
+    <link href="http://example.com/2018/09/01/sortArithment/"/>
+    <id>http://example.com/2018/09/01/sortArithment/</id>
+    <published>2018-09-01T10:43:01.000Z</published>
+    <updated>2022-11-09T03:08:15.785Z</updated>
+    
+    
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;总结一些基础排序算法，有选择排序，冒泡排序，插入排序，快速排序，归并排序和堆排序&lt;/p&gt;
+&lt;/blockquote&gt;</summary>
+    
+    
+    
+    <category term="算法" scheme="http://example.com/categories/%E7%AE%97%E6%B3%95/"/>
+    
+    
+    <category term="算法" scheme="http://example.com/tags/%E7%AE%97%E6%B3%95/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>算法小解</title>
+    <link href="http://example.com/2018/08/18/arithmetic/"/>
+    <id>http://example.com/2018/08/18/arithmetic/</id>
+    <published>2018-08-18T08:50:01.000Z</published>
+    <updated>2022-11-09T03:10:21.316Z</updated>
+    
+    
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;算法题，每日一算,记录自己写过的算法题，&lt;/p&gt;
+&lt;/blockquote&gt;</summary>
+    
+    
+    
+    <category term="算法" scheme="http://example.com/categories/%E7%AE%97%E6%B3%95/"/>
+    
+    
+    <category term="算法" scheme="http://example.com/tags/%E7%AE%97%E6%B3%95/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ArrayList/Vector</title>
+    <link href="http://example.com/2018/07/01/arrayList_vector/"/>
+    <id>http://example.com/2018/07/01/arrayList_vector/</id>
+    <published>2018-07-01T10:43:01.000Z</published>
+    <updated>2022-11-09T03:10:14.440Z</updated>
+    
+    
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;ArrayList&amp;#x2F;Vector的底层分析 &lt;/p&gt;
+&lt;/blockquote&gt;</summary>
+    
+    
+    
+    <category term="java" scheme="http://example.com/categories/java/"/>
+    
+    
+    <category term="java" scheme="http://example.com/tags/java/"/>
+    
+    <category term="collection" scheme="http://example.com/tags/collection/"/>
+    
+  </entry>
+  
+</feed>

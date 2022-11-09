@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+  <meta name="description" content="胡强的博客">
+  
+  <title>
+    ArrayList/Vector |
+    
+    小胡僧
+  </title>
+  <!-- Icon -->
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 6.2.0"><link rel="alternate" href="/atom.xml" title="小胡僧" type="application/atom+xml">
+</head>
+
+<body>
+  <main class="content">
+    <section class="outer">
+  <article id="post-arrayList_vector" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h1 class="article-title" itemprop="name">
+    ArrayList/Vector
+  </h1>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2018/07/01/arrayList_vector/" class="article-date">
+  <time datetime="2018-07-01T10:43:01.000Z" itemprop="datePublished">2018-07-01</time>
+</a>
+      
+<div class="article-category">
+  <a class="article-category-link" href="/categories/java/">java</a>
+</div>
+
+    </div>
+    
+
+    
+    
+<div class="tocbot"></div>
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <blockquote>
+<p>ArrayList&#x2F;Vector的底层分析 </p>
+</blockquote>
+<span id="more"></span>
+<h2 id="ArrayList"><a href="#ArrayList" class="headerlink" title="ArrayList"></a>ArrayList</h2><p><code>ArrayList</code> 实现于<code>List</code>,<code>RandomAccess</code>接口。可以插入空数据，也支持随机访问。<br><code>ArrayList</code>相当于动态数据，其中最重要的两个属性分别是：<code>elementData</code>数组，以及<code>size</code>大小,size表示<code>elementData</code>中已存放元素个数。在调用add() 方法时：     </p>
+<pre>
+    public boolean add(E e) {
+    ensureCapacityInternal(size + 1);
+    elementData[size++] = e;
+    return true;
+}
+</pre>
+
+<ul>
+<li>首先进行扩容检查。</li>
+<li>将插入的值放在尾部，并将 size + 1。</li>
+</ul>
+<p>如果是调用<code>add(index,e)</code> 在指定位置添加的话：</p>
+<pre>
+    public void add(int index, E element) {
+        rangeCheckForAdd(index);
+
+        ensureCapacityInternal(size + 1);  // Increments modCount!!
+        System.arraycopy(elementData, index, elementData, index + 1,
+                         size - index);
+        elementData[index] = element;
+        size++;
+    }
+</pre>
+
+<ul>
+<li>也是首先扩容检验</li>
+<li>接着对数据进行复制，复制的是index后的数据，目的是把index位置空出来放本次插入的数据，并将后面的数据向后移动一个位置。</li>
+</ul>
+<p>这里的<code>System.arrayCopy(Object src,int srcPos,Object dest,int destPos,int length)</code>中的参数：     </p>
+<ul>
+<li><code>Object src</code> : 原数组</li>
+<li><code>int srcPos</code> : 原数组的起始位置开始</li>
+<li><code>Object dest</code>: 目标数组</li>
+<li><code>int destPos</code>: 目标数组的起始位置开始</li>
+<li><code>length</code>     : 要copy的数组的长度</li>
+</ul>
+<hr>
+<p><code>ArrayList</code>的扩容代码：</p>
+<pre>
+    private void grow(int minCapacity) {
+        // overflow-conscious code
+        int oldCapacity = elementData.length;
+        int newCapacity = oldCapacity + (oldCapacity >> 1);
+        if (newCapacity - minCapacity < 0)
+            newCapacity = minCapacity;
+        if (newCapacity - MAX_ARRAY_SIZE > 0)
+            newCapacity = hugeCapacity(minCapacity);
+        // minCapacity is usually close to size, so this is a win:
+        elementData = Arrays.copyOf(elementData, newCapacity);
+    }
+</pre>
+
+<ul>
+<li>本质上也是一个数组的复制过程，只是会加以判断</li>
+<li>所以<code>ArrayList</code>的主要消耗是扩容以及在指定位置添加数据，在日常使用时最好是指定大小，尽量减少扩容。更要减少在指定位置插入数据的操作</li>
+</ul>
+<h2 id="序列化"><a href="#序列化" class="headerlink" title="序列化"></a>序列化</h2><p>ArrayLIst是基于动态数组实现的，所以并不是所有的空间都被使用。因此使用了 <code>transient</code> 修饰，可以防止被自动序列化</p>
+<p><code>transient Object[] elementData;</code></p>
+<p><code>ArrayList</code> 自定义了序列化与反序列化：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">   </span><br><span class="line">private void writeObject(java.io.ObjectOutputStream s)</span><br><span class="line">    throws java.io.IOException&#123;</span><br><span class="line">    // Write out element count, and any hidden stuff</span><br><span class="line">    int expectedModCount = modCount;</span><br><span class="line">    s.defaultWriteObject();</span><br><span class="line"></span><br><span class="line">    // Write out size as capacity for behavioural compatibility with clone()</span><br><span class="line">    s.writeInt(size);</span><br><span class="line"></span><br><span class="line">    // Write out all elements in the proper order.</span><br><span class="line">    for (int i=0;i&lt;size;i++) &#123;</span><br><span class="line">        s.writeObject(elementData[i]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (modCount != expectedModCount) &#123;</span><br><span class="line">        throw new ConcurrentModificationException();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">   </span><br><span class="line">private void readObject(java.io.ObjectInputStream s)</span><br><span class="line">    throws java.io.IOException, ClassNotFoundException &#123;</span><br><span class="line">    elementData = EMPTY_ELEMENTDATA;</span><br><span class="line"></span><br><span class="line">    // Read in size, and any hidden stuff</span><br><span class="line">    s.defaultReadObject();</span><br><span class="line"></span><br><span class="line">    // Read in capacity</span><br><span class="line">    s.readInt(); // ignored</span><br><span class="line"></span><br><span class="line">    if (size &gt; 0) &#123;</span><br><span class="line">        // be like clone(), allocate array based upon size not capacity</span><br><span class="line">        ensureCapacityInternal(size);</span><br><span class="line"></span><br><span class="line">        Object[] a = elementData;</span><br><span class="line">        // Read in all elements in the proper order.</span><br><span class="line">        for (int i=0; i&lt;size;i++) &#123;</span><br><span class="line">            a[i] = s.readObject();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>当对象中自定义了<code> writeObject</code> 和 <code>readObject </code>方法时，<code>JVM</code> 会调用这两个自定义方法来实现序列化与反序列化。从实现中可以看出 <code>ArrayList</code> 只序列化了被使用的数据。</li>
+</ul>
+<h2 id="Vector"><a href="#Vector" class="headerlink" title="Vector"></a>Vector</h2><p><code>Voctor</code> 也是实现于 <code>List</code> 接口，底层数据结构和 <code>ArrayList</code> 类似,也是一个动态数组存放数据。不过是在 <code>add()</code>方法的时候使用 <code>synchronize</code> 进行同步写数据，但是开销较大，所以 <code>Vector</code> 是一个同步容器并不是一个并发容器。</p>
+<p><code>add()</code>方法：</p>
+<pre>
+    public synchronized boolean add(E e) {
+        modCount++;
+        ensureCapacityHelper(elementCount + 1);
+        elementData[elementCount++] = e;
+        return true;
+    }
+</pre>
+
+<p>指定位置插入：</p>
+<pre>
+    public void add(int index, E element) {
+        insertElementAt(element, index);
+    }
+    public synchronized void insertElementAt(E obj, int index) {
+        modCount++;
+        if (index > elementCount) {
+            throw new ArrayIndexOutOfBoundsException(index
+                                                     + " > " + elementCount);
+        }
+        ensureCapacityHelper(elementCount + 1);
+        System.arraycopy(elementData, index, elementData, index + 1, elementCount - index);
+        elementData[index] = obj;
+        elementCount++;
+    }
+</pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2018/07/01/arrayList_vector/" data-id="cla9j67jt0007xupieb54gk0r" class="article-share-link">
+        Share
+      </a>
+      
+<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collection/" rel="tag">collection</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/" rel="tag">java</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+  
+<nav class="article-nav">
+  
+  <a href="/2018/08/18/arithmetic/" class="article-nav-link">
+    <strong class="article-nav-caption">Newer</strong>
+    <div class="article-nav-title">
+      
+      算法小解
+      
+    </div>
+  </a>
+  
+  
+</nav>
+
+  
+
+  
+  
+  
+  
+
+</article>
+</section>
+    <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>小胡僧 &copy; 2022</li>
+      
+        <li>
+          
+            <a href="https://beian.miit.gov.cn/" target="_blank"></a>
+            
+        </li>
+      
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+    </ul>
+    
+  </div>
+</footer>
+  </main>
+  <aside class="sidebar">
+    <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/hexo.svg" alt="小胡僧"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories/">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/gallery/">相册</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about/">关于</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+  </aside>
+  
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+  });
+</script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+
+</html>

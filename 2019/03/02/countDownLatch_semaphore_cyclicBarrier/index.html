@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+  <meta name="description" content="胡强的博客">
+  
+  <title>
+    JUC中的同步方法 |
+    
+    小胡僧
+  </title>
+  <!-- Icon -->
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 6.2.0"><link rel="alternate" href="/atom.xml" title="小胡僧" type="application/atom+xml">
+</head>
+
+<body>
+  <main class="content">
+    <section class="outer">
+  <article id="post-countDownLatch_semaphore_cyclicBarrier" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h1 class="article-title" itemprop="name">
+    JUC中的同步方法
+  </h1>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2019/03/02/countDownLatch_semaphore_cyclicBarrier/" class="article-date">
+  <time datetime="2019-03-02T10:43:01.000Z" itemprop="datePublished">2019-03-02</time>
+</a>
+      
+<div class="article-category">
+  <a class="article-category-link" href="/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B/">多线程</a>
+</div>
+
+    </div>
+    
+
+    
+    
+<div class="tocbot"></div>
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <blockquote>
+<p>对Java并发包中的同步方法<code>CountDownLatch</code>,<code>Semaphore</code>,<code>CyclicBarrier</code>进行说明和举例</p>
+</blockquote>
+<span id="more"></span>
+<h2 id="信号量同步"><a href="#信号量同步" class="headerlink" title="信号量同步"></a>信号量同步</h2><p>信号量同步是指在不同线程之间，通过传递同步信号量来协调线程执行的先后次序。</p>
+<h3 id="Semphore"><a href="#Semphore" class="headerlink" title="Semphore"></a>Semphore</h3><ul>
+<li><code>Semphore</code>是基于空间信号的同步情况。只有在调用<code>Semphore</code>对象的<code>acquire()</code>成功后，才可以往下执行，完成后执行<code>release()</code>释放持有的信号量，下一个线程就可以马上获取这个空间信号量进入执行。他的作用在于控制并发数，每次只允许Semphore设定的线程数执行任务。<ul>
+<li>举例：假设某机场海关通道共有3个窗口，一批需要出关的人排成长队，每个人都是一个线程。当三个窗口中任意一个出现空闲，就指定队列中的一个人去窗口接受检查，如果没有空闲则在队列等待。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SemaphoreTest</span> &#123;</span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">       <span class="comment">//假定三个信号量，即三个服务窗口</span></span><br><span class="line">       <span class="type">Semaphore</span> <span class="variable">semaphore</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Semaphore</span>(<span class="number">3</span>);</span><br><span class="line">       <span class="comment">//五个线程即有5个人在排队</span></span><br><span class="line">       <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">5</span>;i++)&#123;</span><br><span class="line">           <span class="keyword">new</span> <span class="title class_">SecurityCheckThread</span>(i,semaphore).start();</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">SecurityCheckThread</span> <span class="keyword">extends</span> <span class="title class_">Thread</span>&#123;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">private</span> <span class="type">int</span> seq;</span><br><span class="line">       <span class="keyword">private</span> Semaphore semaphore;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">public</span> <span class="title function_">SecurityCheckThread</span><span class="params">(<span class="type">int</span> seq,Semaphore semaphore)</span>&#123;</span><br><span class="line">           <span class="built_in">this</span>.seq = seq;</span><br><span class="line">           <span class="built_in">this</span>.semaphore = semaphore;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">       <span class="meta">@Override</span></span><br><span class="line">       <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">           <span class="keyword">try</span>&#123;</span><br><span class="line">               semaphore.acquire();</span><br><span class="line">               System.out.println(<span class="string">&quot;NO.&quot;</span>+ seq + <span class="string">&quot;乘客正在接受检查。。&quot;</span>);</span><br><span class="line"></span><br><span class="line">               <span class="comment">//假设整除以2的人是可疑人，需要更长时间来安检</span></span><br><span class="line">               <span class="keyword">if</span>(seq % <span class="number">2</span> == <span class="number">0</span>)&#123;</span><br><span class="line">                   Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">                   System.out.println(<span class="string">&quot;NO.&quot;</span>+ seq + <span class="string">&quot;是可疑人，不能出国！&quot;</span>);</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;<span class="keyword">catch</span> (InterruptedException e)&#123;</span><br><span class="line">               e.printStackTrace();</span><br><span class="line">           &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">               semaphore.release();</span><br><span class="line">               System.out.println(<span class="string">&quot;NO.&quot;</span> + seq + <span class="string">&quot;乘客检查完毕！&quot;</span>);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">  </span><br></pre></td></tr></table></figure>
+<h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><ul>
+<li><code>CountDownLatch</code>是基于执行时间的同步类，<code>CountDownLatch</code>初始时定义了资源总量state&#x3D;count,调用<code>countDown()</code>不断将<code>state</code>减1,当<code>state</code>为0时才能获得锁，释放后state就一直为0。所有线程调用<code>await()</code>都不会等待，所以<code>CountDownLatch</code>是一次性的，用完后再想用就必须重新创建一个；如果需要循环使用推荐使用基于<code>ReentrantLock</code>实现的<code>CyclicBarrier</code>。<ul>
+<li>例子：在进行文件传输的时候由于文件太大，把文件拆分成多块，分别由多个子线程传输，最后进行合并。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 一个或者多个线程等待其它线程完成操作</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CountDownLatchTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException&#123;</span><br><span class="line">        <span class="type">CountDownLatch</span> <span class="variable">c</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CountDownLatch</span>(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">TransmitThread</span>(c, <span class="string">&quot;1st content&quot;</span>).start();</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">TransmitThread</span>(c, <span class="string">&quot;2st content&quot;</span>).start();</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">TransmitThread</span>(c,<span class="string">&quot;3st content&quot;</span>).start();</span><br><span class="line"></span><br><span class="line">        c.await(<span class="number">10</span>,TimeUnit.SECONDS);</span><br><span class="line">        System.out.println(<span class="string">&quot;传输完成进行文件合并。。&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">TransmitThread</span> <span class="keyword">extends</span> <span class="title class_">Thread</span>&#123;</span><br><span class="line">        <span class="keyword">private</span> String content;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> CountDownLatch countDownLatch;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="title function_">TransmitThread</span><span class="params">(CountDownLatch countDownLatch,String content)</span> &#123;</span><br><span class="line">             <span class="built_in">this</span>.countDownLatch = countDownLatch;</span><br><span class="line">             <span class="built_in">this</span>.content = content;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">            System.out.println(content + <span class="string">&quot;传输已完成！&quot;</span>);</span><br><span class="line">            countDownLatch.countDown();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="CyclicBarrier"><a href="#CyclicBarrier" class="headerlink" title="CyclicBarrier"></a>CyclicBarrier</h3><ul>
+<li>CyclicBarrier是基于同步到达某个点的信号触发机制，通过reset()重置为其初始状态。<ul>
+<li>CyclicBarrier从命名就可以看出来它是一个可以循环(Cyclic)使用的屏障(Barrier)多线程协作方式。采用这种方式进行第一个例子的安检服务，就是三个人同时进入，只有三个人都检查完成才放下一批进来。</li>
+</ul>
+</li>
+</ul>
+<p>** 无论从性能还是安全性考虑，我们都应该尽可能的使用并发包中的信号同步类避免使用对象的<code>wait()</code>,<code>notify()</code>方法来实现同步 **</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2019/03/02/countDownLatch_semaphore_cyclicBarrier/" data-id="cla9j67ju0009xupi85s8h6lj" class="article-share-link">
+        Share
+      </a>
+      
+<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JUC/" rel="tag">JUC</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/" rel="tag">java</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+  
+<nav class="article-nav">
+  
+  <a href="/2019/12/02/mysql%20index/" class="article-nav-link">
+    <strong class="article-nav-caption">Newer</strong>
+    <div class="article-nav-title">
+      
+      MySQL索引初探
+      
+    </div>
+  </a>
+  
+  
+  <a href="/2018/09/12/threePool/" class="article-nav-link">
+    <strong class="article-nav-caption">Older</strong>
+    <div class="article-nav-title">线程池笔记</div>
+  </a>
+  
+</nav>
+
+  
+
+  
+  
+  
+  
+
+</article>
+</section>
+    <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>小胡僧 &copy; 2022</li>
+      
+        <li>
+          
+            <a href="https://beian.miit.gov.cn/" target="_blank"></a>
+            
+        </li>
+      
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+    </ul>
+    
+  </div>
+</footer>
+  </main>
+  <aside class="sidebar">
+    <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/hexo.svg" alt="小胡僧"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories/">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/gallery/">相册</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about/">关于</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+  </aside>
+  
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+  });
+</script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+
+</html>
