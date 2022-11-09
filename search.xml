@@ -1212,273 +1212,6 @@
       </tags>
   </entry>
   <entry>
-    <title>MySQL索引初探</title>
-    <url>/2019/12/02/mysql%20index/</url>
-    <content><![CDATA[<blockquote>
-<p>MySQL索引初探</p>
-</blockquote>
-<span id="more"></span>
-
-<h2 id="什么是索引"><a href="#什么是索引" class="headerlink" title="什么是索引"></a>什么是索引</h2><h3 id="索引简介"><a href="#索引简介" class="headerlink" title="索引简介"></a>索引简介</h3><p>​      数据库索引 , 是数据库管理系统中一个排序的<strong>数据结构</strong>,以协助快速查询、更新数据库表中的数据。就是数据库在数据之外还维护着一个特定的查找算法的<strong>数据结构</strong>,在这个数据结构上高效的查找，这就是索引。那么索引的关键就在于这个<strong>数据结构</strong>。</p>
-<h3 id="索引数据结构"><a href="#索引数据结构" class="headerlink" title="索引数据结构"></a>索引数据结构</h3><p>​      在对一组数据进行查找时一般会把树维护在一颗排序的树上, 然后在树上进行高效的查找。这里以一颗二叉搜索树为例, 看一下如果用二叉搜索树充当数据库索引的这个数据结构, 他是怎样的过程。</p>
-<p><img src="E:\gitHub\myBlog\source\images\tree1.jpg.png" alt="tree1.jpg"></p>
-<p>​        如上图&lt;我是个无耻的盗图贼(●ˇ∀ˇ●)&gt;  右图为一个二叉搜索树 ,  左边为表中数据的结构。二叉树中的节点和表的数据一一对应, 当你要搜索某条数据只需要遍历树即可。比如需要查询23, 只需要遍历34, 22, 23 三次就找到23。这其实就是最简版的索引结构, 当然mysql中并不是使用二叉搜索树这种简单数据结构, 而是使用b+树来实现innodb的索引结构的, 后面会详细的讲解。</p>
-<h2 id="MySQL中索引的类型"><a href="#MySQL中索引的类型" class="headerlink" title="MySQL中索引的类型"></a>MySQL中索引的类型</h2><h2 id="B-树索引"><a href="#B-树索引" class="headerlink" title="B+树索引"></a>B+树索引</h2><h2 id="聚簇索引-x2F-辅助索引"><a href="#聚簇索引-x2F-辅助索引" class="headerlink" title="聚簇索引&#x2F;辅助索引"></a>聚簇索引&#x2F;辅助索引</h2><h2 id="B-树索引的优缺点"><a href="#B-树索引的优缺点" class="headerlink" title="B+树索引的优缺点"></a>B+树索引的优缺点</h2><h2 id="索引的使用策略"><a href="#索引的使用策略" class="headerlink" title="索引的使用策略"></a>索引的使用策略</h2>]]></content>
-      <categories>
-        <category>mysql</category>
-      </categories>
-      <tags>
-        <tag>mysql</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JUC中的同步方法</title>
-    <url>/2019/03/02/countDownLatch_semaphore_cyclicBarrier/</url>
-    <content><![CDATA[<blockquote>
-<p>对Java并发包中的同步方法<code>CountDownLatch</code>,<code>Semaphore</code>,<code>CyclicBarrier</code>进行说明和举例</p>
-</blockquote>
-<span id="more"></span>
-<h2 id="信号量同步"><a href="#信号量同步" class="headerlink" title="信号量同步"></a>信号量同步</h2><p>信号量同步是指在不同线程之间，通过传递同步信号量来协调线程执行的先后次序。</p>
-<h3 id="Semphore"><a href="#Semphore" class="headerlink" title="Semphore"></a>Semphore</h3><ul>
-<li><code>Semphore</code>是基于空间信号的同步情况。只有在调用<code>Semphore</code>对象的<code>acquire()</code>成功后，才可以往下执行，完成后执行<code>release()</code>释放持有的信号量，下一个线程就可以马上获取这个空间信号量进入执行。他的作用在于控制并发数，每次只允许Semphore设定的线程数执行任务。<ul>
-<li>举例：假设某机场海关通道共有3个窗口，一批需要出关的人排成长队，每个人都是一个线程。当三个窗口中任意一个出现空闲，就指定队列中的一个人去窗口接受检查，如果没有空闲则在队列等待。</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SemaphoreTest</span> &#123;</span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">       <span class="comment">//假定三个信号量，即三个服务窗口</span></span><br><span class="line">       <span class="type">Semaphore</span> <span class="variable">semaphore</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Semaphore</span>(<span class="number">3</span>);</span><br><span class="line">       <span class="comment">//五个线程即有5个人在排队</span></span><br><span class="line">       <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">5</span>;i++)&#123;</span><br><span class="line">           <span class="keyword">new</span> <span class="title class_">SecurityCheckThread</span>(i,semaphore).start();</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">SecurityCheckThread</span> <span class="keyword">extends</span> <span class="title class_">Thread</span>&#123;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">private</span> <span class="type">int</span> seq;</span><br><span class="line">       <span class="keyword">private</span> Semaphore semaphore;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">public</span> <span class="title function_">SecurityCheckThread</span><span class="params">(<span class="type">int</span> seq,Semaphore semaphore)</span>&#123;</span><br><span class="line">           <span class="built_in">this</span>.seq = seq;</span><br><span class="line">           <span class="built_in">this</span>.semaphore = semaphore;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">       <span class="meta">@Override</span></span><br><span class="line">       <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">           <span class="keyword">try</span>&#123;</span><br><span class="line">               semaphore.acquire();</span><br><span class="line">               System.out.println(<span class="string">&quot;NO.&quot;</span>+ seq + <span class="string">&quot;乘客正在接受检查。。&quot;</span>);</span><br><span class="line"></span><br><span class="line">               <span class="comment">//假设整除以2的人是可疑人，需要更长时间来安检</span></span><br><span class="line">               <span class="keyword">if</span>(seq % <span class="number">2</span> == <span class="number">0</span>)&#123;</span><br><span class="line">                   Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">                   System.out.println(<span class="string">&quot;NO.&quot;</span>+ seq + <span class="string">&quot;是可疑人，不能出国！&quot;</span>);</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;<span class="keyword">catch</span> (InterruptedException e)&#123;</span><br><span class="line">               e.printStackTrace();</span><br><span class="line">           &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">               semaphore.release();</span><br><span class="line">               System.out.println(<span class="string">&quot;NO.&quot;</span> + seq + <span class="string">&quot;乘客检查完毕！&quot;</span>);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">  </span><br></pre></td></tr></table></figure>
-<h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><ul>
-<li><code>CountDownLatch</code>是基于执行时间的同步类，<code>CountDownLatch</code>初始时定义了资源总量state&#x3D;count,调用<code>countDown()</code>不断将<code>state</code>减1,当<code>state</code>为0时才能获得锁，释放后state就一直为0。所有线程调用<code>await()</code>都不会等待，所以<code>CountDownLatch</code>是一次性的，用完后再想用就必须重新创建一个；如果需要循环使用推荐使用基于<code>ReentrantLock</code>实现的<code>CyclicBarrier</code>。<ul>
-<li>例子：在进行文件传输的时候由于文件太大，把文件拆分成多块，分别由多个子线程传输，最后进行合并。</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 一个或者多个线程等待其它线程完成操作</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CountDownLatchTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException&#123;</span><br><span class="line">        <span class="type">CountDownLatch</span> <span class="variable">c</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CountDownLatch</span>(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">TransmitThread</span>(c, <span class="string">&quot;1st content&quot;</span>).start();</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">TransmitThread</span>(c, <span class="string">&quot;2st content&quot;</span>).start();</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">TransmitThread</span>(c,<span class="string">&quot;3st content&quot;</span>).start();</span><br><span class="line"></span><br><span class="line">        c.await(<span class="number">10</span>,TimeUnit.SECONDS);</span><br><span class="line">        System.out.println(<span class="string">&quot;传输完成进行文件合并。。&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">TransmitThread</span> <span class="keyword">extends</span> <span class="title class_">Thread</span>&#123;</span><br><span class="line">        <span class="keyword">private</span> String content;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> CountDownLatch countDownLatch;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="title function_">TransmitThread</span><span class="params">(CountDownLatch countDownLatch,String content)</span> &#123;</span><br><span class="line">             <span class="built_in">this</span>.countDownLatch = countDownLatch;</span><br><span class="line">             <span class="built_in">this</span>.content = content;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">            System.out.println(content + <span class="string">&quot;传输已完成！&quot;</span>);</span><br><span class="line">            countDownLatch.countDown();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<h3 id="CyclicBarrier"><a href="#CyclicBarrier" class="headerlink" title="CyclicBarrier"></a>CyclicBarrier</h3><ul>
-<li>CyclicBarrier是基于同步到达某个点的信号触发机制，通过reset()重置为其初始状态。<ul>
-<li>CyclicBarrier从命名就可以看出来它是一个可以循环(Cyclic)使用的屏障(Barrier)多线程协作方式。采用这种方式进行第一个例子的安检服务，就是三个人同时进入，只有三个人都检查完成才放下一批进来。</li>
-</ul>
-</li>
-</ul>
-<p>** 无论从性能还是安全性考虑，我们都应该尽可能的使用并发包中的信号同步类避免使用对象的<code>wait()</code>,<code>notify()</code>方法来实现同步 **</p>
-]]></content>
-      <categories>
-        <category>多线程</category>
-      </categories>
-      <tags>
-        <tag>java</tag>
-        <tag>JUC</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>线程池笔记</title>
-    <url>/2018/09/12/threePool/</url>
-    <content><![CDATA[<blockquote>
-<p>对线程池实现的总结以及各种阻塞队列的作用和区别</p>
-</blockquote>
-<span id="more"></span>
-
-<h2 id="使用线程池带来的好处"><a href="#使用线程池带来的好处" class="headerlink" title="使用线程池带来的好处"></a>使用线程池带来的好处</h2><ul>
-<li>大家都知道，线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以对线程进行统一分配管理。java中几乎所有的异步或并发执行任务的程序都可以使用线程池</li>
-<li>合理的使用线程池可以带来三个好处   <ul>
-<li>降低资源消耗，通过重复利用已创建的线程降低线程创建和销毁造成的消耗</li>
-<li>提高相应速度，任务到达时可以不需要等到线程创建就可以立即执行</li>
-<li>提高线程的可管理性，使用线程池可以对线程统一分配，调优，监控，使线程的使用更加的可控</li>
-</ul>
-</li>
-</ul>
-<h2 id="线程池实现原理"><a href="#线程池实现原理" class="headerlink" title="线程池实现原理"></a>线程池实现原理</h2><ul>
-<li>当向线程池提交一个任务后，线程池是如何处理这个任务的？？？</li>
-</ul>
-<p><img src="https://i.imgur.com/kpjd2oP.jpg"></p>
-<p>  如上方执行示意图：</p>
-<ul>
-<li><p>ThreadPoolExector执行execute方法分为下面4种情况 </p>
-<ol>
-<li>线程池在执行一个任务的时候， 如果当前运行的线程少于corePoolSize,则创建新线程来执行任务（需要获取全局锁）</li>
-<li>如果运行的线程多于或等于corePoolSize，则将任务加入BlockingQueue</li>
-<li>如果无法将任务加入BlockingQueue（队列已满），则将创建新的线程来执行任务（需要获取全局锁）</li>
-<li>如果创建新的线程使当前线程超出maximumPoolSize，则任务将被拒绝，并调用RejectExectionHandler.rejectedExection()</li>
-</ol>
-</li>
-</ul>
-<p>threadPoolExecutor采用上述步骤的总体设计思路，是为了在执行exector的时候尽量避免获取全局锁（一个严重的可伸缩瓶颈）。在threadPoolExector预热之后（当前运行的线程数大于等于corePoolSize），几乎所有的execute()方法都都是执行步骤2，而步骤2是不需要获取全局锁的    </p>
-<h2 id="线程池的使用"><a href="#线程池的使用" class="headerlink" title="线程池的使用"></a>线程池的使用</h2><p>可以通过threadPoolExecutor来创建一个线程池<br><code>new ThreadPoolExecutor(corePoolSize,maximumPoolSize,keepAliveTime,         milliseconds,runnableTaskQueue,handler);</code>  </p>
-<p>参数说明：</p>
-<ul>
-<li><p>corePoolSize(线程池的基本大小):当提交一个任务到线程池时，线程会创建一个线程执行任务，即使核心线程池有空闲线程，也会执行新的线程，当线程大于corePoolSize时就不会再创建。如果调用了prestartAllCoreThreads()方法，线程池会提前创建并启动所有基本线程</p>
-</li>
-<li><p>runnableTaskQueue（任务队列）:用于保存等待执行的任务的阻塞队列，关于阻塞队列</p>
-<ol>
-<li>ArrayBlockingQueue:是一个基于数组结构的有界阻塞队列，此队列按FIFO原则对元素排序</li>
-<li>LinkedBlockingQueue:是一个基于链表结构的有界队列，此队列按照FIFO排序元素吞吐量高于ArrayBlockingQUeue,Executors.newFixedThreadPool()就是使用的这个队列，默认和最大长度为integer.MAX_VALUE</li>
-<li>SynchronousQueue:一个不存储元素的阻塞队列，每个插入操作必须等到另一个线程调用移除操作，否则插入操作一直处于阻塞状态，静态工厂方法Executors.newCachedThreadPool使用了这个队列</li>
-<li>PriorityBlockingQueue是一个支持优先级的无界阻塞队列，默认情况下元素采用自然顺序升序排序，当然也可以自定义排序规则</li>
-</ol>
-</li>
-<li><p>maximumPoolSize(线程池最大数量)：线程池允许创建的最大线程数，如果使用了无界任务队列，这个参数就没什么效果</p>
-</li>
-<li><p>rejectedExecutionhandler(饱和策略):当队列和线程池都满了，说明线程池处于饱和状态，那么就需要采用饱和策略处理提交的任务。这个策略默认情况下是AbortPolicy,表示无法处理新任务时抛出异常，jdk1.5以后有如下策略：</p>
-<ol>
-<li>AbortPolicy：直接抛出异常</li>
-<li>disCardPolicy:不处理，丢弃掉</li>
-<li>DisCardOldestPolicy:丢弃队列种最近的一个任务，并执行当前任务</li>
-<li>callerRunsPolicy:只用调用者所在线程来运行任务</li>
-</ol>
-</li>
-<li><p>keepAliveTime(线程活动保持时间):线程池的工作线程空闲后，保持存活的时间</p>
-</li>
-<li><p>TimeUnit(线程存活的时间单位)：</p>
-</li>
-</ul>
-<h2 id="向线程池提交任务和关闭线程池"><a href="#向线程池提交任务和关闭线程池" class="headerlink" title="向线程池提交任务和关闭线程池"></a>向线程池提交任务和关闭线程池</h2><ul>
-<li><p>可以使用两个方法向线程池提交任务，分别为execute()和submit()</p>
-<ul>
-<li>execute方法用于提交不需要返回值的任务，所以无法判断任务是否被线程池执行成功</li>
-<li>submit方法用于提交需要返回值的任务，线程池会返回一个future类型的对象，通过调用future对象的get()方法来获取返回值，get()方法会阻塞当前线程直到任务完成，也可以使用get(long TimeOut,TimeUnit unit)会阻塞线程一段时间然后返回。</li>
-</ul>
-</li>
-<li><p>可以调用线程池的shutdown和shutdown方法来关闭线程池，</p>
-<ul>
-<li>shutdownNow将线程池的状态设置成stop，然后尝试停止所有正在执行或者暂停的线程，返回等待执行任务的列表</li>
-<li>shutdown将线程池的状态设置成shutdown，然后中断没有执行任务的线程</li>
-</ul>
-</li>
-</ul>
-<h2 id="Executors工厂类"><a href="#Executors工厂类" class="headerlink" title="Executors工厂类"></a>Executors工厂类</h2><p>ThreadPoolExecutor通常使用工厂类Executors创建，Executors可以创建3种类型的ThreadPoolExecutor:SingleThreadExecutor,FixedThreadPool和CachedThreadPool。 </p>
-<ul>
-<li><p>FixedThreadPool详解</p>
-<ul>
-<li>FixedThreadPool使用无界队列LinkBlockingQueue作为线程池的工作队列(队列容量为Integer.MAX_VALUE)。使用无界队列时maximuPoolSize是一个无效参数。</li>
-<li>FixedThreadPool的corePoolSize和maximumPoolSize都被设置为创建FixedPoolThread时指定的参数nThreads。keepAliveTime被设置为0L,意味着多余的空闲线程会被立即终止。</li>
-<li>FixedThreadPool被称为固定线程数的线程池，源代码：</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static ExecutorService newFixedThreadPool(int nThreads) &#123;</span><br><span class="line">   return new ThreadPoolExecutor(nThreads, nThreads,</span><br><span class="line">      0L, TimeUnit.MILLISECONDS,new LinkedBlockingQueue&lt;Runnable&gt;());</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>流程图<br><img src="https://i.imgur.com/IlXEDbG.png"></p>
-</li>
-<li><p>SingleThreadExecutor详解</p>
-<ul>
-<li>SingleThreadExecutor的corePoolSize和maximumPoolSize被设置为1,使用无界队列LinkBlockingQueue作为线程池的工作队列(队列容量为Integer.MAX_VALUE)</li>
-<li>如果当前线程小于corePoolSize(即线程池中无线程)，创建一个线程来执行任务，如果有一个线程，则将任务加入LinkBlockingQuque,线程执行完后会循环从队列中获取任务执行。</li>
-<li>SingleThreadExecutor是使用单个worker线程的Executor,源码：</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">public static ExecutorService newSingleThreadExecutor() &#123;</span><br><span class="line">   return new FinalizableDelegatedExecutorService</span><br><span class="line">       (new ThreadPoolExecutor(1, 1,</span><br><span class="line">                               0L, TimeUnit.MILLISECONDS,</span><br><span class="line">                               new LinkedBlockingQueue&lt;Runnable&gt;()));</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>流程图<br><img src="https://i.imgur.com/UyXk43R.png">  </p>
-</li>
-<li><p>CachedThreadPool详解</p>
-<ul>
-<li>corePoolSize设置为0，maximumPoolSize设置为integer.MAX_VALUE,即maximumPoolSize是无界的，</li>
-<li>CachedThreadPool使用没有容量的SynchronousQueue作为线程池的工作队列</li>
-<li>在极端情况下，即提交任务的速度高于maximumPool中线程处理的熟读时，CachedPoolThread会不断创建线程，耗尽cpu和内存资源</li>
-<li>CachedThreadPool是一个会根据需要创建线程的线程池，源码如下：</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">public static ExecutorService newCachedThreadPool() &#123;</span><br><span class="line">    return new ThreadPoolExecutor(0, Integer.MAX_VALUE,</span><br><span class="line">                                  60L, TimeUnit.SECONDS,</span><br><span class="line">                                  new SynchronousQueue&lt;Runnable&gt;());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>流程图：<br><img src="https://i.imgur.com/ravLVcd.png"></li>
-</ul>
-]]></content>
-      <categories>
-        <category>多线程</category>
-      </categories>
-      <tags>
-        <tag>threadPool</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>三次握手，四次挥手详解</title>
-    <url>/2018/09/08/socket_connect_close/</url>
-    <content><![CDATA[<blockquote>
-<p>总结一下TCP&#x2F;IP中三次握手和四次挥手的实现过程和各种状态，以及为什么要三次握手，四次挥手，四次挥手中为什么会有time_wait&#x3D;2MSL等一些问题…..</p>
-</blockquote>
-<span id="more"></span>
-
-
-<p>为了通过IP数据报实现可靠性传输，需要考虑很多事情，例如数据的破坏，丢包，重复等问题，如果不能解决这些问题，就无从谈起可靠传输。TCP通过检验和序列号，确认应答，重发控制，连接管理，以及窗口控制等机制，实现可靠传输。</p>
-<h3 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h3><ul>
-<li>最开始的时候客户端与服务器都处于CLOSED状态，主动打开的是client被动打开的是server。</li>
-<li>client向服务器发出连接请求，TCP首部发送一个SYN&#x3D;1包作为建立连接的请求，等待确认应答，同时选择一个初始序列号seq&#x3D;x。</li>
-<li>server收到请求报文后，如果同意链接，接收端会返回一个已收到消息的通知，这个消息叫做确认应答(ACK),确认应答号ack&#x3D;x+1,同时也要自己初始化一个序列号seq&#x3D;y,以及连接请求SYN&#x3D;1</li>
-<li>client收到确认后，也要向服务器给出确认。确认报文ACK&#x3D;1,确认应答号ack&#x3D;y+1,自己的序列号seq&#x3D;x+1,此时TCP连接建立，双发可以开始通信了。</li>
-</ul>
-<p><img src="https://i.imgur.com/59y7S5p.png" alt="三次握手"></p>
-<ol>
-<li>如果超过一定时间未收到确认应答，发送端将进行数据重发。比如第一次client未收到server的确认应答，超时后就会重新发送连接请求；同样server未收到client的确认应答，超时后也会重新发送连接请求。</li>
-<li>为什么client最后还要发送一次确认：<br>主要是防止失效连接的报文有传送到服务器，产生错误。如果使用的是两次握手建立连接，假设有这样一种场景，客户端发送了第一个请求连接并且没有丢失，只是因为在网络结点中滞留的时间太长了，由于TCP的客户端迟迟没有收到确认报文，以为服务器没有收到，此时重新向服务器发送这条报文，此后客户端和服务器经过两次握手完成连接，传输数据，然后关闭连接。此时此前滞留的那一次请求连接，网络通畅了到达了服务器，这个报文本该是失效的，但是，两次握手的机制将会让客户端和服务器再次建立连接，这将导致不必要的错误和资源的浪费。如果采用的是三次握手，就算是那一次失效的报文传送过来了，服务端接受到了那条失效报文并且回复了确认报文，但是客户端不会再次发出确认。由于服务器收不到确认，就知道客户端并没有请求连接</li>
-<li>server端易受到syn攻击：<br>syn攻击就是Client在短时间内伪造大量不存在的IP地址，并向server不断的发送syn连接请求，server则回复确认包，并等待client确认，但由于IP地址不存在，所以不会发送确认应答。那么server就会不断重发直至超时，这些伪造的syn包将长时间占用未连接队列，导致正常的syn请求因为队满而被丢弃，从而引起网络阻塞甚至系统瘫痪。<br>防范SYN攻击措施：降低主机的等待时间使主机尽快的释放半连接的占用，短时间受到某IP的重复SYN则丢弃后续请求等。</li>
-</ol>
-<h3 id="四次挥手"><a href="#四次挥手" class="headerlink" title="四次挥手"></a>四次挥手</h3><p>数据传输完毕后，释放连接，双发都可以调用close释放连接，由是谁发起的关闭连接客户端服务端分为主动关闭和被动关闭。</p>
-<ul>
-<li>加入客户端先发起的关闭连接请求，Tcp首部会发送一个FIN&#x3D;1作为释放连接请求，其序列号seq&#x3D;u(等于前面已经传送过来的数据的最后一个字节的序号加1)，这时客户端从established状态变成fin-wait-1状态，这时的客户端只能接收数据，不能发送数据.</li>
-<li>服务器收到释放连接的报文后，发出确认应答ACK&#x3D;1，确认应答号ack&#x3D;u+1,并带上自己的序列号seq&#x3D;v，此时服务器从established状态变为close_wait状态，在该状态的服务器可能还会发送数据，所以可能会持续一段时间。</li>
-<li>客户端收到服务器的确认应答后，客户端就进入fin-wait-2状态，等待服务器发送释放连接报文，在这个期间，还会接受服务器发送的数据。</li>
-<li>服务器最后的数据发送完之后，就向客户端发送释放连接报文，FIN&#x3D;1，ACK&#x3D;1，ack&#x3D;u+1，自己的序列号seq&#x3D;w(由于是半连接，可能又发送了一些数据，所以序列号不同)，此时服务器就进入last_ack等待客户端的确认应答。</li>
-<li>客户端收到释放连接请求后，发出确认应答，ACK&#x3D;1，ack&#x3D;w+1,序列号seq&#x3D;u+1，此时客户端进入time_wait必须经过2MSL(最长报文时间)后进入closed。</li>
-<li>服务器只要收到确认应答立即进入closed状态。</li>
-</ul>
-<p><img src="https://i.imgur.com/qIBpRT9.png"></p>
-<ol>
-<li>为什么time_wait要等待2MSL才进入closed？<br>第一，保证客户端发送的最后一个ACK报文能够到达服务器，因为这个ACK报文可能丢失，站在服务器的角度看来，我已经发送了FIN+ACK报文请求断开了，客户端还没有给我回应，应该是我发送的请求断开报文它没有收到，于是服务器又会重新发送一次，而客户端就能在这个2MSL时间段内收到这个重传的报文，接着给出回应报文，并且会重启2MSL计时器。<br>第二，防止类似与“三次握手”中提到了的“已经失效的连接请求报文段”出现在本连接中。客户端发送完最后一个确认报文后，在这个2MSL时间中，就可以使本连接持续的时间内所产生的所有报文段都从网络中消失。这样新的连接中不会出现旧连接的请求报文。</li>
-</ol>
-]]></content>
-      <categories>
-        <category>TCP/IP</category>
-      </categories>
-      <tags>
-        <tag>TCP/IP</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>排序算法</title>
-    <url>/2018/09/01/sortArithment/</url>
-    <content><![CDATA[<blockquote>
-<p>总结一些基础排序算法，有选择排序，冒泡排序，插入排序，快速排序，归并排序和堆排序</p>
-</blockquote>
-<span id="more"></span>
-
-<h2 id="简单选择排序"><a href="#简单选择排序" class="headerlink" title="简单选择排序"></a>简单选择排序</h2><ul>
-<li>选择排序其实就是一个双重for循环，从头开始每次选择一个最小或最大的数放在队首。</li>
-</ul>
-<p>代码如下：    </p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">   </span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">selectSort</span><span class="params">(<span class="type">int</span>[] array)</span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i=<span class="number">0</span>;i&lt;=array.length-<span class="number">1</span>;i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> i + <span class="number">1</span>; j &lt;=array.length - <span class="number">1</span>; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (array[i] &gt; array[j]) &#123;</span><br><span class="line">                <span class="type">int</span> <span class="variable">temp</span> <span class="operator">=</span> array[i];</span><br><span class="line">                array[i] = array[j];</span><br><span class="line">                array[j] = temp;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="冒泡排序"><a href="#冒泡排序" class="headerlink" title="冒泡排序"></a>冒泡排序</h2><ul>
-<li>冒泡排序就是，从头开始每次相邻两个数依次比较并交换，最后冒泡出最小或最大的一个数在队尾，</li>
-</ul>
-<p>代码如下：    </p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">bubbleSort</span><span class="params">(<span class="type">int</span>[] array)</span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(array == <span class="literal">null</span> || array.length &lt;=<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;array.length-<span class="number">1</span>;i++)&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j=<span class="number">0</span>;j&lt;array.length-<span class="number">1</span>-i;++j)&#123;</span><br><span class="line">            <span class="keyword">if</span>(array[j] &gt; array[j+<span class="number">1</span>])&#123;</span><br><span class="line">                <span class="type">int</span> <span class="variable">temp</span> <span class="operator">=</span> array[j];</span><br><span class="line">                array[j] = array[j+<span class="number">1</span>];</span><br><span class="line">                array[j+<span class="number">1</span>] = temp;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<h2 id="插入排序"><a href="#插入排序" class="headerlink" title="插入排序"></a>插入排序</h2><ul>
-<li>插入排序，就是从第2个元素开始，每次插入前面已经排好的序列中，</li>
-</ul>
-<p>代码如下：    </p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">inserSort</span><span class="params">(<span class="type">int</span>[] array)</span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(array == <span class="literal">null</span> || array.length &lt;= <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;= array.length-<span class="number">1</span>;i++)&#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> i;</span><br><span class="line">        <span class="keyword">while</span>(j&gt;<span class="number">0</span> &amp;&amp; array[j] &lt; array[j-<span class="number">1</span>])&#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">temp</span> <span class="operator">=</span> array[j];</span><br><span class="line">            array[j] = array[j-<span class="number">1</span>];</span><br><span class="line">            array[j-<span class="number">1</span>] = temp;</span><br><span class="line">            j--;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<h2 id="快速排序"><a href="#快速排序" class="headerlink" title="快速排序"></a>快速排序</h2><ul>
-<li>快速排序就是，选定第一个元素为基准index，先从尾到头遍历，找到第一个比index小的数交换，然后从头往到尾遍历，找到第一个比index大的数交换，重复循环，知道low&#x3D;hight。此时index左边序列都比index小，右边序列都比index大，然后左右依次递归，排序。<br>代码如下：</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">sort_1</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> low, <span class="type">int</span> hight)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> arr[low];  <span class="comment">//用数组第一个元素做基准</span></span><br><span class="line">    <span class="keyword">while</span> (low &lt; hight) &#123;</span><br><span class="line">        <span class="comment">//从后半部分向前扫描找比基准小的high下标</span></span><br><span class="line">        <span class="keyword">while</span> (arr[hight] &gt;= index &amp;&amp; low &lt; hight) &#123;</span><br><span class="line">            hight--;</span><br><span class="line">        &#125;</span><br><span class="line">        arr[low] = arr[hight];</span><br><span class="line">        <span class="comment">//从前半部分向后扫描</span></span><br><span class="line">        <span class="keyword">while</span> (arr[low] &lt;= index &amp;&amp; low &lt; hight) &#123;</span><br><span class="line">            low++;</span><br><span class="line">        &#125;</span><br><span class="line">        arr[hight] = arr[low];</span><br><span class="line">    &#125;</span><br><span class="line">    arr[low] = index;</span><br><span class="line">    <span class="keyword">return</span> low;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">sort_2</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> low, <span class="type">int</span> hight)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (low &gt;= hight) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">mid</span> <span class="operator">=</span> sort_1(arr,low,hight);</span><br><span class="line">        sort_2(arr,low,mid-<span class="number">1</span>);</span><br><span class="line">        sort_2(arr,mid+<span class="number">1</span>,hight);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="归并排序"><a href="#归并排序" class="headerlink" title="归并排序"></a>归并排序</h2><ul>
-<li>归并排序其实可以理解为，合并两个已经排序的数组，然后递归！<br>代码如下：</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">sort</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> left, <span class="type">int</span> right, <span class="type">int</span>[] temp)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (left &lt; right) &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">mid</span> <span class="operator">=</span> (left + right) /<span class="number">2</span>;</span><br><span class="line">        sort(arr,left,mid,temp);  <span class="comment">//左边归并，使左边有序</span></span><br><span class="line">        sort(arr,mid+<span class="number">1</span>,right,temp); <span class="comment">//右边归并，使右边有序</span></span><br><span class="line">        merge(arr,left,mid,right,temp);  <span class="comment">//将两个有序的数组合并操作</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//将两个有序的数列合并</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">merge</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> left, <span class="type">int</span> mid, <span class="type">int</span> right, <span class="type">int</span>[] temp)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> left;  <span class="comment">//左序列指针</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> mid+<span class="number">1</span>; <span class="comment">//右序列指针</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">t</span> <span class="operator">=</span> <span class="number">0</span>;  <span class="comment">//临时数组指针</span></span><br><span class="line">    <span class="keyword">while</span> (i &lt;= mid &amp;&amp; j &lt;= right) &#123;</span><br><span class="line">        <span class="keyword">if</span> (arr[i] &lt; arr[j]) &#123;</span><br><span class="line">            temp[t++] = arr[i++];</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            temp[t++] = arr[j++];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> (i&lt;=mid) &#123;</span><br><span class="line">        temp[t++] = arr[i++];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> (j&lt;=right) &#123;</span><br><span class="line">        temp[t++] = arr[j++];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//把临时数组的值覆盖到arr数组中去</span></span><br><span class="line">    t=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (left &lt;=right) &#123;</span><br><span class="line">        arr[left++] = temp[t++];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-]]></content>
-      <categories>
-        <category>算法</category>
-      </categories>
-      <tags>
-        <tag>算法</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>算法小解</title>
     <url>/2018/08/18/arithmetic/</url>
     <content><![CDATA[<blockquote>
@@ -1733,6 +1466,273 @@
       <tags>
         <tag>java</tag>
         <tag>collection</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JUC中的同步方法</title>
+    <url>/2019/03/02/countDownLatch_semaphore_cyclicBarrier/</url>
+    <content><![CDATA[<blockquote>
+<p>对Java并发包中的同步方法<code>CountDownLatch</code>,<code>Semaphore</code>,<code>CyclicBarrier</code>进行说明和举例</p>
+</blockquote>
+<span id="more"></span>
+<h2 id="信号量同步"><a href="#信号量同步" class="headerlink" title="信号量同步"></a>信号量同步</h2><p>信号量同步是指在不同线程之间，通过传递同步信号量来协调线程执行的先后次序。</p>
+<h3 id="Semphore"><a href="#Semphore" class="headerlink" title="Semphore"></a>Semphore</h3><ul>
+<li><code>Semphore</code>是基于空间信号的同步情况。只有在调用<code>Semphore</code>对象的<code>acquire()</code>成功后，才可以往下执行，完成后执行<code>release()</code>释放持有的信号量，下一个线程就可以马上获取这个空间信号量进入执行。他的作用在于控制并发数，每次只允许Semphore设定的线程数执行任务。<ul>
+<li>举例：假设某机场海关通道共有3个窗口，一批需要出关的人排成长队，每个人都是一个线程。当三个窗口中任意一个出现空闲，就指定队列中的一个人去窗口接受检查，如果没有空闲则在队列等待。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SemaphoreTest</span> &#123;</span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">       <span class="comment">//假定三个信号量，即三个服务窗口</span></span><br><span class="line">       <span class="type">Semaphore</span> <span class="variable">semaphore</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Semaphore</span>(<span class="number">3</span>);</span><br><span class="line">       <span class="comment">//五个线程即有5个人在排队</span></span><br><span class="line">       <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">5</span>;i++)&#123;</span><br><span class="line">           <span class="keyword">new</span> <span class="title class_">SecurityCheckThread</span>(i,semaphore).start();</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">SecurityCheckThread</span> <span class="keyword">extends</span> <span class="title class_">Thread</span>&#123;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">private</span> <span class="type">int</span> seq;</span><br><span class="line">       <span class="keyword">private</span> Semaphore semaphore;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">public</span> <span class="title function_">SecurityCheckThread</span><span class="params">(<span class="type">int</span> seq,Semaphore semaphore)</span>&#123;</span><br><span class="line">           <span class="built_in">this</span>.seq = seq;</span><br><span class="line">           <span class="built_in">this</span>.semaphore = semaphore;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">       <span class="meta">@Override</span></span><br><span class="line">       <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">           <span class="keyword">try</span>&#123;</span><br><span class="line">               semaphore.acquire();</span><br><span class="line">               System.out.println(<span class="string">&quot;NO.&quot;</span>+ seq + <span class="string">&quot;乘客正在接受检查。。&quot;</span>);</span><br><span class="line"></span><br><span class="line">               <span class="comment">//假设整除以2的人是可疑人，需要更长时间来安检</span></span><br><span class="line">               <span class="keyword">if</span>(seq % <span class="number">2</span> == <span class="number">0</span>)&#123;</span><br><span class="line">                   Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">                   System.out.println(<span class="string">&quot;NO.&quot;</span>+ seq + <span class="string">&quot;是可疑人，不能出国！&quot;</span>);</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;<span class="keyword">catch</span> (InterruptedException e)&#123;</span><br><span class="line">               e.printStackTrace();</span><br><span class="line">           &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">               semaphore.release();</span><br><span class="line">               System.out.println(<span class="string">&quot;NO.&quot;</span> + seq + <span class="string">&quot;乘客检查完毕！&quot;</span>);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">  </span><br></pre></td></tr></table></figure>
+<h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><ul>
+<li><code>CountDownLatch</code>是基于执行时间的同步类，<code>CountDownLatch</code>初始时定义了资源总量state&#x3D;count,调用<code>countDown()</code>不断将<code>state</code>减1,当<code>state</code>为0时才能获得锁，释放后state就一直为0。所有线程调用<code>await()</code>都不会等待，所以<code>CountDownLatch</code>是一次性的，用完后再想用就必须重新创建一个；如果需要循环使用推荐使用基于<code>ReentrantLock</code>实现的<code>CyclicBarrier</code>。<ul>
+<li>例子：在进行文件传输的时候由于文件太大，把文件拆分成多块，分别由多个子线程传输，最后进行合并。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 一个或者多个线程等待其它线程完成操作</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CountDownLatchTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException&#123;</span><br><span class="line">        <span class="type">CountDownLatch</span> <span class="variable">c</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CountDownLatch</span>(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">TransmitThread</span>(c, <span class="string">&quot;1st content&quot;</span>).start();</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">TransmitThread</span>(c, <span class="string">&quot;2st content&quot;</span>).start();</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">TransmitThread</span>(c,<span class="string">&quot;3st content&quot;</span>).start();</span><br><span class="line"></span><br><span class="line">        c.await(<span class="number">10</span>,TimeUnit.SECONDS);</span><br><span class="line">        System.out.println(<span class="string">&quot;传输完成进行文件合并。。&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">TransmitThread</span> <span class="keyword">extends</span> <span class="title class_">Thread</span>&#123;</span><br><span class="line">        <span class="keyword">private</span> String content;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> CountDownLatch countDownLatch;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="title function_">TransmitThread</span><span class="params">(CountDownLatch countDownLatch,String content)</span> &#123;</span><br><span class="line">             <span class="built_in">this</span>.countDownLatch = countDownLatch;</span><br><span class="line">             <span class="built_in">this</span>.content = content;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">            System.out.println(content + <span class="string">&quot;传输已完成！&quot;</span>);</span><br><span class="line">            countDownLatch.countDown();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="CyclicBarrier"><a href="#CyclicBarrier" class="headerlink" title="CyclicBarrier"></a>CyclicBarrier</h3><ul>
+<li>CyclicBarrier是基于同步到达某个点的信号触发机制，通过reset()重置为其初始状态。<ul>
+<li>CyclicBarrier从命名就可以看出来它是一个可以循环(Cyclic)使用的屏障(Barrier)多线程协作方式。采用这种方式进行第一个例子的安检服务，就是三个人同时进入，只有三个人都检查完成才放下一批进来。</li>
+</ul>
+</li>
+</ul>
+<p>** 无论从性能还是安全性考虑，我们都应该尽可能的使用并发包中的信号同步类避免使用对象的<code>wait()</code>,<code>notify()</code>方法来实现同步 **</p>
+]]></content>
+      <categories>
+        <category>多线程</category>
+      </categories>
+      <tags>
+        <tag>java</tag>
+        <tag>JUC</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MySQL索引初探</title>
+    <url>/2019/12/02/mysql%20index/</url>
+    <content><![CDATA[<blockquote>
+<p>MySQL索引初探</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="什么是索引"><a href="#什么是索引" class="headerlink" title="什么是索引"></a>什么是索引</h2><h3 id="索引简介"><a href="#索引简介" class="headerlink" title="索引简介"></a>索引简介</h3><p>​      数据库索引 , 是数据库管理系统中一个排序的<strong>数据结构</strong>,以协助快速查询、更新数据库表中的数据。就是数据库在数据之外还维护着一个特定的查找算法的<strong>数据结构</strong>,在这个数据结构上高效的查找，这就是索引。那么索引的关键就在于这个<strong>数据结构</strong>。</p>
+<h3 id="索引数据结构"><a href="#索引数据结构" class="headerlink" title="索引数据结构"></a>索引数据结构</h3><p>​      在对一组数据进行查找时一般会把树维护在一颗排序的树上, 然后在树上进行高效的查找。这里以一颗二叉搜索树为例, 看一下如果用二叉搜索树充当数据库索引的这个数据结构, 他是怎样的过程。</p>
+<p><img src="E:\gitHub\myBlog\source\images\tree1.jpg.png" alt="tree1.jpg"></p>
+<p>​        如上图&lt;我是个无耻的盗图贼(●ˇ∀ˇ●)&gt;  右图为一个二叉搜索树 ,  左边为表中数据的结构。二叉树中的节点和表的数据一一对应, 当你要搜索某条数据只需要遍历树即可。比如需要查询23, 只需要遍历34, 22, 23 三次就找到23。这其实就是最简版的索引结构, 当然mysql中并不是使用二叉搜索树这种简单数据结构, 而是使用b+树来实现innodb的索引结构的, 后面会详细的讲解。</p>
+<h2 id="MySQL中索引的类型"><a href="#MySQL中索引的类型" class="headerlink" title="MySQL中索引的类型"></a>MySQL中索引的类型</h2><h2 id="B-树索引"><a href="#B-树索引" class="headerlink" title="B+树索引"></a>B+树索引</h2><h2 id="聚簇索引-x2F-辅助索引"><a href="#聚簇索引-x2F-辅助索引" class="headerlink" title="聚簇索引&#x2F;辅助索引"></a>聚簇索引&#x2F;辅助索引</h2><h2 id="B-树索引的优缺点"><a href="#B-树索引的优缺点" class="headerlink" title="B+树索引的优缺点"></a>B+树索引的优缺点</h2><h2 id="索引的使用策略"><a href="#索引的使用策略" class="headerlink" title="索引的使用策略"></a>索引的使用策略</h2>]]></content>
+      <categories>
+        <category>mysql</category>
+      </categories>
+      <tags>
+        <tag>mysql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>排序算法</title>
+    <url>/2018/09/01/sortArithment/</url>
+    <content><![CDATA[<blockquote>
+<p>总结一些基础排序算法，有选择排序，冒泡排序，插入排序，快速排序，归并排序和堆排序</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="简单选择排序"><a href="#简单选择排序" class="headerlink" title="简单选择排序"></a>简单选择排序</h2><ul>
+<li>选择排序其实就是一个双重for循环，从头开始每次选择一个最小或最大的数放在队首。</li>
+</ul>
+<p>代码如下：    </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">   </span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">selectSort</span><span class="params">(<span class="type">int</span>[] array)</span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i=<span class="number">0</span>;i&lt;=array.length-<span class="number">1</span>;i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> i + <span class="number">1</span>; j &lt;=array.length - <span class="number">1</span>; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (array[i] &gt; array[j]) &#123;</span><br><span class="line">                <span class="type">int</span> <span class="variable">temp</span> <span class="operator">=</span> array[i];</span><br><span class="line">                array[i] = array[j];</span><br><span class="line">                array[j] = temp;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="冒泡排序"><a href="#冒泡排序" class="headerlink" title="冒泡排序"></a>冒泡排序</h2><ul>
+<li>冒泡排序就是，从头开始每次相邻两个数依次比较并交换，最后冒泡出最小或最大的一个数在队尾，</li>
+</ul>
+<p>代码如下：    </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">bubbleSort</span><span class="params">(<span class="type">int</span>[] array)</span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(array == <span class="literal">null</span> || array.length &lt;=<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;array.length-<span class="number">1</span>;i++)&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j=<span class="number">0</span>;j&lt;array.length-<span class="number">1</span>-i;++j)&#123;</span><br><span class="line">            <span class="keyword">if</span>(array[j] &gt; array[j+<span class="number">1</span>])&#123;</span><br><span class="line">                <span class="type">int</span> <span class="variable">temp</span> <span class="operator">=</span> array[j];</span><br><span class="line">                array[j] = array[j+<span class="number">1</span>];</span><br><span class="line">                array[j+<span class="number">1</span>] = temp;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="插入排序"><a href="#插入排序" class="headerlink" title="插入排序"></a>插入排序</h2><ul>
+<li>插入排序，就是从第2个元素开始，每次插入前面已经排好的序列中，</li>
+</ul>
+<p>代码如下：    </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">inserSort</span><span class="params">(<span class="type">int</span>[] array)</span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(array == <span class="literal">null</span> || array.length &lt;= <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;= array.length-<span class="number">1</span>;i++)&#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> i;</span><br><span class="line">        <span class="keyword">while</span>(j&gt;<span class="number">0</span> &amp;&amp; array[j] &lt; array[j-<span class="number">1</span>])&#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">temp</span> <span class="operator">=</span> array[j];</span><br><span class="line">            array[j] = array[j-<span class="number">1</span>];</span><br><span class="line">            array[j-<span class="number">1</span>] = temp;</span><br><span class="line">            j--;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="快速排序"><a href="#快速排序" class="headerlink" title="快速排序"></a>快速排序</h2><ul>
+<li>快速排序就是，选定第一个元素为基准index，先从尾到头遍历，找到第一个比index小的数交换，然后从头往到尾遍历，找到第一个比index大的数交换，重复循环，知道low&#x3D;hight。此时index左边序列都比index小，右边序列都比index大，然后左右依次递归，排序。<br>代码如下：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">sort_1</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> low, <span class="type">int</span> hight)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">index</span> <span class="operator">=</span> arr[low];  <span class="comment">//用数组第一个元素做基准</span></span><br><span class="line">    <span class="keyword">while</span> (low &lt; hight) &#123;</span><br><span class="line">        <span class="comment">//从后半部分向前扫描找比基准小的high下标</span></span><br><span class="line">        <span class="keyword">while</span> (arr[hight] &gt;= index &amp;&amp; low &lt; hight) &#123;</span><br><span class="line">            hight--;</span><br><span class="line">        &#125;</span><br><span class="line">        arr[low] = arr[hight];</span><br><span class="line">        <span class="comment">//从前半部分向后扫描</span></span><br><span class="line">        <span class="keyword">while</span> (arr[low] &lt;= index &amp;&amp; low &lt; hight) &#123;</span><br><span class="line">            low++;</span><br><span class="line">        &#125;</span><br><span class="line">        arr[hight] = arr[low];</span><br><span class="line">    &#125;</span><br><span class="line">    arr[low] = index;</span><br><span class="line">    <span class="keyword">return</span> low;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">sort_2</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> low, <span class="type">int</span> hight)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (low &gt;= hight) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">mid</span> <span class="operator">=</span> sort_1(arr,low,hight);</span><br><span class="line">        sort_2(arr,low,mid-<span class="number">1</span>);</span><br><span class="line">        sort_2(arr,mid+<span class="number">1</span>,hight);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="归并排序"><a href="#归并排序" class="headerlink" title="归并排序"></a>归并排序</h2><ul>
+<li>归并排序其实可以理解为，合并两个已经排序的数组，然后递归！<br>代码如下：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">sort</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> left, <span class="type">int</span> right, <span class="type">int</span>[] temp)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (left &lt; right) &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">mid</span> <span class="operator">=</span> (left + right) /<span class="number">2</span>;</span><br><span class="line">        sort(arr,left,mid,temp);  <span class="comment">//左边归并，使左边有序</span></span><br><span class="line">        sort(arr,mid+<span class="number">1</span>,right,temp); <span class="comment">//右边归并，使右边有序</span></span><br><span class="line">        merge(arr,left,mid,right,temp);  <span class="comment">//将两个有序的数组合并操作</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//将两个有序的数列合并</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">merge</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> left, <span class="type">int</span> mid, <span class="type">int</span> right, <span class="type">int</span>[] temp)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> left;  <span class="comment">//左序列指针</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> mid+<span class="number">1</span>; <span class="comment">//右序列指针</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">t</span> <span class="operator">=</span> <span class="number">0</span>;  <span class="comment">//临时数组指针</span></span><br><span class="line">    <span class="keyword">while</span> (i &lt;= mid &amp;&amp; j &lt;= right) &#123;</span><br><span class="line">        <span class="keyword">if</span> (arr[i] &lt; arr[j]) &#123;</span><br><span class="line">            temp[t++] = arr[i++];</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            temp[t++] = arr[j++];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> (i&lt;=mid) &#123;</span><br><span class="line">        temp[t++] = arr[i++];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> (j&lt;=right) &#123;</span><br><span class="line">        temp[t++] = arr[j++];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//把临时数组的值覆盖到arr数组中去</span></span><br><span class="line">    t=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (left &lt;=right) &#123;</span><br><span class="line">        arr[left++] = temp[t++];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+]]></content>
+      <categories>
+        <category>算法</category>
+      </categories>
+      <tags>
+        <tag>算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>线程池笔记</title>
+    <url>/2018/09/12/threePool/</url>
+    <content><![CDATA[<blockquote>
+<p>对线程池实现的总结以及各种阻塞队列的作用和区别</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="使用线程池带来的好处"><a href="#使用线程池带来的好处" class="headerlink" title="使用线程池带来的好处"></a>使用线程池带来的好处</h2><ul>
+<li>大家都知道，线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以对线程进行统一分配管理。java中几乎所有的异步或并发执行任务的程序都可以使用线程池</li>
+<li>合理的使用线程池可以带来三个好处   <ul>
+<li>降低资源消耗，通过重复利用已创建的线程降低线程创建和销毁造成的消耗</li>
+<li>提高相应速度，任务到达时可以不需要等到线程创建就可以立即执行</li>
+<li>提高线程的可管理性，使用线程池可以对线程统一分配，调优，监控，使线程的使用更加的可控</li>
+</ul>
+</li>
+</ul>
+<h2 id="线程池实现原理"><a href="#线程池实现原理" class="headerlink" title="线程池实现原理"></a>线程池实现原理</h2><ul>
+<li>当向线程池提交一个任务后，线程池是如何处理这个任务的？？？</li>
+</ul>
+<p><img src="https://i.imgur.com/kpjd2oP.jpg"></p>
+<p>  如上方执行示意图：</p>
+<ul>
+<li><p>ThreadPoolExector执行execute方法分为下面4种情况 </p>
+<ol>
+<li>线程池在执行一个任务的时候， 如果当前运行的线程少于corePoolSize,则创建新线程来执行任务（需要获取全局锁）</li>
+<li>如果运行的线程多于或等于corePoolSize，则将任务加入BlockingQueue</li>
+<li>如果无法将任务加入BlockingQueue（队列已满），则将创建新的线程来执行任务（需要获取全局锁）</li>
+<li>如果创建新的线程使当前线程超出maximumPoolSize，则任务将被拒绝，并调用RejectExectionHandler.rejectedExection()</li>
+</ol>
+</li>
+</ul>
+<p>threadPoolExecutor采用上述步骤的总体设计思路，是为了在执行exector的时候尽量避免获取全局锁（一个严重的可伸缩瓶颈）。在threadPoolExector预热之后（当前运行的线程数大于等于corePoolSize），几乎所有的execute()方法都都是执行步骤2，而步骤2是不需要获取全局锁的    </p>
+<h2 id="线程池的使用"><a href="#线程池的使用" class="headerlink" title="线程池的使用"></a>线程池的使用</h2><p>可以通过threadPoolExecutor来创建一个线程池<br><code>new ThreadPoolExecutor(corePoolSize,maximumPoolSize,keepAliveTime,         milliseconds,runnableTaskQueue,handler);</code>  </p>
+<p>参数说明：</p>
+<ul>
+<li><p>corePoolSize(线程池的基本大小):当提交一个任务到线程池时，线程会创建一个线程执行任务，即使核心线程池有空闲线程，也会执行新的线程，当线程大于corePoolSize时就不会再创建。如果调用了prestartAllCoreThreads()方法，线程池会提前创建并启动所有基本线程</p>
+</li>
+<li><p>runnableTaskQueue（任务队列）:用于保存等待执行的任务的阻塞队列，关于阻塞队列</p>
+<ol>
+<li>ArrayBlockingQueue:是一个基于数组结构的有界阻塞队列，此队列按FIFO原则对元素排序</li>
+<li>LinkedBlockingQueue:是一个基于链表结构的有界队列，此队列按照FIFO排序元素吞吐量高于ArrayBlockingQUeue,Executors.newFixedThreadPool()就是使用的这个队列，默认和最大长度为integer.MAX_VALUE</li>
+<li>SynchronousQueue:一个不存储元素的阻塞队列，每个插入操作必须等到另一个线程调用移除操作，否则插入操作一直处于阻塞状态，静态工厂方法Executors.newCachedThreadPool使用了这个队列</li>
+<li>PriorityBlockingQueue是一个支持优先级的无界阻塞队列，默认情况下元素采用自然顺序升序排序，当然也可以自定义排序规则</li>
+</ol>
+</li>
+<li><p>maximumPoolSize(线程池最大数量)：线程池允许创建的最大线程数，如果使用了无界任务队列，这个参数就没什么效果</p>
+</li>
+<li><p>rejectedExecutionhandler(饱和策略):当队列和线程池都满了，说明线程池处于饱和状态，那么就需要采用饱和策略处理提交的任务。这个策略默认情况下是AbortPolicy,表示无法处理新任务时抛出异常，jdk1.5以后有如下策略：</p>
+<ol>
+<li>AbortPolicy：直接抛出异常</li>
+<li>disCardPolicy:不处理，丢弃掉</li>
+<li>DisCardOldestPolicy:丢弃队列种最近的一个任务，并执行当前任务</li>
+<li>callerRunsPolicy:只用调用者所在线程来运行任务</li>
+</ol>
+</li>
+<li><p>keepAliveTime(线程活动保持时间):线程池的工作线程空闲后，保持存活的时间</p>
+</li>
+<li><p>TimeUnit(线程存活的时间单位)：</p>
+</li>
+</ul>
+<h2 id="向线程池提交任务和关闭线程池"><a href="#向线程池提交任务和关闭线程池" class="headerlink" title="向线程池提交任务和关闭线程池"></a>向线程池提交任务和关闭线程池</h2><ul>
+<li><p>可以使用两个方法向线程池提交任务，分别为execute()和submit()</p>
+<ul>
+<li>execute方法用于提交不需要返回值的任务，所以无法判断任务是否被线程池执行成功</li>
+<li>submit方法用于提交需要返回值的任务，线程池会返回一个future类型的对象，通过调用future对象的get()方法来获取返回值，get()方法会阻塞当前线程直到任务完成，也可以使用get(long TimeOut,TimeUnit unit)会阻塞线程一段时间然后返回。</li>
+</ul>
+</li>
+<li><p>可以调用线程池的shutdown和shutdown方法来关闭线程池，</p>
+<ul>
+<li>shutdownNow将线程池的状态设置成stop，然后尝试停止所有正在执行或者暂停的线程，返回等待执行任务的列表</li>
+<li>shutdown将线程池的状态设置成shutdown，然后中断没有执行任务的线程</li>
+</ul>
+</li>
+</ul>
+<h2 id="Executors工厂类"><a href="#Executors工厂类" class="headerlink" title="Executors工厂类"></a>Executors工厂类</h2><p>ThreadPoolExecutor通常使用工厂类Executors创建，Executors可以创建3种类型的ThreadPoolExecutor:SingleThreadExecutor,FixedThreadPool和CachedThreadPool。 </p>
+<ul>
+<li><p>FixedThreadPool详解</p>
+<ul>
+<li>FixedThreadPool使用无界队列LinkBlockingQueue作为线程池的工作队列(队列容量为Integer.MAX_VALUE)。使用无界队列时maximuPoolSize是一个无效参数。</li>
+<li>FixedThreadPool的corePoolSize和maximumPoolSize都被设置为创建FixedPoolThread时指定的参数nThreads。keepAliveTime被设置为0L,意味着多余的空闲线程会被立即终止。</li>
+<li>FixedThreadPool被称为固定线程数的线程池，源代码：</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">public static ExecutorService newFixedThreadPool(int nThreads) &#123;</span><br><span class="line">   return new ThreadPoolExecutor(nThreads, nThreads,</span><br><span class="line">      0L, TimeUnit.MILLISECONDS,new LinkedBlockingQueue&lt;Runnable&gt;());</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>流程图<br><img src="https://i.imgur.com/IlXEDbG.png"></p>
+</li>
+<li><p>SingleThreadExecutor详解</p>
+<ul>
+<li>SingleThreadExecutor的corePoolSize和maximumPoolSize被设置为1,使用无界队列LinkBlockingQueue作为线程池的工作队列(队列容量为Integer.MAX_VALUE)</li>
+<li>如果当前线程小于corePoolSize(即线程池中无线程)，创建一个线程来执行任务，如果有一个线程，则将任务加入LinkBlockingQuque,线程执行完后会循环从队列中获取任务执行。</li>
+<li>SingleThreadExecutor是使用单个worker线程的Executor,源码：</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">public static ExecutorService newSingleThreadExecutor() &#123;</span><br><span class="line">   return new FinalizableDelegatedExecutorService</span><br><span class="line">       (new ThreadPoolExecutor(1, 1,</span><br><span class="line">                               0L, TimeUnit.MILLISECONDS,</span><br><span class="line">                               new LinkedBlockingQueue&lt;Runnable&gt;()));</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>流程图<br><img src="https://i.imgur.com/UyXk43R.png">  </p>
+</li>
+<li><p>CachedThreadPool详解</p>
+<ul>
+<li>corePoolSize设置为0，maximumPoolSize设置为integer.MAX_VALUE,即maximumPoolSize是无界的，</li>
+<li>CachedThreadPool使用没有容量的SynchronousQueue作为线程池的工作队列</li>
+<li>在极端情况下，即提交任务的速度高于maximumPool中线程处理的熟读时，CachedPoolThread会不断创建线程，耗尽cpu和内存资源</li>
+<li>CachedThreadPool是一个会根据需要创建线程的线程池，源码如下：</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">public static ExecutorService newCachedThreadPool() &#123;</span><br><span class="line">    return new ThreadPoolExecutor(0, Integer.MAX_VALUE,</span><br><span class="line">                                  60L, TimeUnit.SECONDS,</span><br><span class="line">                                  new SynchronousQueue&lt;Runnable&gt;());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>流程图：<br><img src="https://i.imgur.com/ravLVcd.png"></li>
+</ul>
+]]></content>
+      <categories>
+        <category>多线程</category>
+      </categories>
+      <tags>
+        <tag>threadPool</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>三次握手，四次挥手详解</title>
+    <url>/2018/09/08/socket_connect_close/</url>
+    <content><![CDATA[<blockquote>
+<p>总结一下TCP&#x2F;IP中三次握手和四次挥手的实现过程和各种状态，以及为什么要三次握手，四次挥手，四次挥手中为什么会有time_wait&#x3D;2MSL等一些问题…..</p>
+</blockquote>
+<span id="more"></span>
+
+
+<p>为了通过IP数据报实现可靠性传输，需要考虑很多事情，例如数据的破坏，丢包，重复等问题，如果不能解决这些问题，就无从谈起可靠传输。TCP通过检验和序列号，确认应答，重发控制，连接管理，以及窗口控制等机制，实现可靠传输。</p>
+<h3 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h3><ul>
+<li>最开始的时候客户端与服务器都处于CLOSED状态，主动打开的是client被动打开的是server。</li>
+<li>client向服务器发出连接请求，TCP首部发送一个SYN&#x3D;1包作为建立连接的请求，等待确认应答，同时选择一个初始序列号seq&#x3D;x。</li>
+<li>server收到请求报文后，如果同意链接，接收端会返回一个已收到消息的通知，这个消息叫做确认应答(ACK),确认应答号ack&#x3D;x+1,同时也要自己初始化一个序列号seq&#x3D;y,以及连接请求SYN&#x3D;1</li>
+<li>client收到确认后，也要向服务器给出确认。确认报文ACK&#x3D;1,确认应答号ack&#x3D;y+1,自己的序列号seq&#x3D;x+1,此时TCP连接建立，双发可以开始通信了。</li>
+</ul>
+<p><img src="https://i.imgur.com/59y7S5p.png" alt="三次握手"></p>
+<ol>
+<li>如果超过一定时间未收到确认应答，发送端将进行数据重发。比如第一次client未收到server的确认应答，超时后就会重新发送连接请求；同样server未收到client的确认应答，超时后也会重新发送连接请求。</li>
+<li>为什么client最后还要发送一次确认：<br>主要是防止失效连接的报文有传送到服务器，产生错误。如果使用的是两次握手建立连接，假设有这样一种场景，客户端发送了第一个请求连接并且没有丢失，只是因为在网络结点中滞留的时间太长了，由于TCP的客户端迟迟没有收到确认报文，以为服务器没有收到，此时重新向服务器发送这条报文，此后客户端和服务器经过两次握手完成连接，传输数据，然后关闭连接。此时此前滞留的那一次请求连接，网络通畅了到达了服务器，这个报文本该是失效的，但是，两次握手的机制将会让客户端和服务器再次建立连接，这将导致不必要的错误和资源的浪费。如果采用的是三次握手，就算是那一次失效的报文传送过来了，服务端接受到了那条失效报文并且回复了确认报文，但是客户端不会再次发出确认。由于服务器收不到确认，就知道客户端并没有请求连接</li>
+<li>server端易受到syn攻击：<br>syn攻击就是Client在短时间内伪造大量不存在的IP地址，并向server不断的发送syn连接请求，server则回复确认包，并等待client确认，但由于IP地址不存在，所以不会发送确认应答。那么server就会不断重发直至超时，这些伪造的syn包将长时间占用未连接队列，导致正常的syn请求因为队满而被丢弃，从而引起网络阻塞甚至系统瘫痪。<br>防范SYN攻击措施：降低主机的等待时间使主机尽快的释放半连接的占用，短时间受到某IP的重复SYN则丢弃后续请求等。</li>
+</ol>
+<h3 id="四次挥手"><a href="#四次挥手" class="headerlink" title="四次挥手"></a>四次挥手</h3><p>数据传输完毕后，释放连接，双发都可以调用close释放连接，由是谁发起的关闭连接客户端服务端分为主动关闭和被动关闭。</p>
+<ul>
+<li>加入客户端先发起的关闭连接请求，Tcp首部会发送一个FIN&#x3D;1作为释放连接请求，其序列号seq&#x3D;u(等于前面已经传送过来的数据的最后一个字节的序号加1)，这时客户端从established状态变成fin-wait-1状态，这时的客户端只能接收数据，不能发送数据.</li>
+<li>服务器收到释放连接的报文后，发出确认应答ACK&#x3D;1，确认应答号ack&#x3D;u+1,并带上自己的序列号seq&#x3D;v，此时服务器从established状态变为close_wait状态，在该状态的服务器可能还会发送数据，所以可能会持续一段时间。</li>
+<li>客户端收到服务器的确认应答后，客户端就进入fin-wait-2状态，等待服务器发送释放连接报文，在这个期间，还会接受服务器发送的数据。</li>
+<li>服务器最后的数据发送完之后，就向客户端发送释放连接报文，FIN&#x3D;1，ACK&#x3D;1，ack&#x3D;u+1，自己的序列号seq&#x3D;w(由于是半连接，可能又发送了一些数据，所以序列号不同)，此时服务器就进入last_ack等待客户端的确认应答。</li>
+<li>客户端收到释放连接请求后，发出确认应答，ACK&#x3D;1，ack&#x3D;w+1,序列号seq&#x3D;u+1，此时客户端进入time_wait必须经过2MSL(最长报文时间)后进入closed。</li>
+<li>服务器只要收到确认应答立即进入closed状态。</li>
+</ul>
+<p><img src="https://i.imgur.com/qIBpRT9.png"></p>
+<ol>
+<li>为什么time_wait要等待2MSL才进入closed？<br>第一，保证客户端发送的最后一个ACK报文能够到达服务器，因为这个ACK报文可能丢失，站在服务器的角度看来，我已经发送了FIN+ACK报文请求断开了，客户端还没有给我回应，应该是我发送的请求断开报文它没有收到，于是服务器又会重新发送一次，而客户端就能在这个2MSL时间段内收到这个重传的报文，接着给出回应报文，并且会重启2MSL计时器。<br>第二，防止类似与“三次握手”中提到了的“已经失效的连接请求报文段”出现在本连接中。客户端发送完最后一个确认报文后，在这个2MSL时间中，就可以使本连接持续的时间内所产生的所有报文段都从网络中消失。这样新的连接中不会出现旧连接的请求报文。</li>
+</ol>
+]]></content>
+      <categories>
+        <category>TCP/IP</category>
+      </categories>
+      <tags>
+        <tag>TCP/IP</tag>
       </tags>
   </entry>
 </search>
